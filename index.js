@@ -61,15 +61,15 @@ function handleIssues(issuesJson, userIssues) {
         // }
        
         if(numComments > 0) {
-            console.log('numComments pulled: ' + numComments);
-            console.log('pulling for issueID: ' + issueID);
-            console.log(typeof(issueID));
-            userIssues.listIssueComments(issueID)
-                .then(function({data: commentsJson}) {
-                    console.log('Num comments: ' + commentsJson.length);
-                }).catch(function(err) {
-                    console.log(err);
-                });
+        console.log('numComments pulled: ' + numComments);
+        console.log('pulling for issueID: ' + issueID);
+        console.log(typeof(issueID));
+        userIssues.listIssueComments(issueID)
+            .then(function({data: commentsJson}) {
+                console.log('Num comments: ' + commentsJson.length);
+            }).catch(function(err) {
+                console.log(err);
+            });
         }
     }
 }
