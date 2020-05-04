@@ -25,14 +25,13 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
         // return immediately if issue has no comments
         if(comments.length == 0) {
             console.log('no comments at all');
-            return 0;
+            return null;
         } else {
             var commentCreationTime;
             var earliestCreationTime = new Date(comments[0].created_at);
             for (var i = 0; i < comments.length; i++) {
                 commentCreationTime = new Date(comments[i].created_at);
                 console.log('commentCreationTime: ' + commentCreationTime);
-                // console.log('difference: ' + (commentCreationTime - earliestCreationTime));
                 if(commentCreationTime.getTime() < earliestCreationTime.getTime()) {
                     console.log('diff > 0');
                     earliestCreationTime = commentCreationTime;
@@ -63,6 +62,19 @@ function getAverage(times) {
     return sum/times.length;
 }
 
+function createIssue(octokit, repoOwner, repoName, averageResponseTime) {
+    const issueBody = `Great job! This month, your repository's average response time has decreased 5% since last month!\n` + 
+                    `At an average of ${averageResponseTime} hours, your response time was better than 70% of the communities on Github!`;
+    const {data: issue} = yield octokit.issues.create({
+        owner: repoOwner,
+        repo: repoName,
+        title: 'Montly Responsiveness Update',
+        body: issueBody
+    })
+
+    console.log('issueBody: \n' + issue.body);
+}
+
 function run () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -71,24 +83,6 @@ function run () {
             const repoOwner = 'jadelyyy';
 
             var octokit = new github.GitHub(userToken);
-            // var octokit = new Octokit({
-            //     auth: userToken
-            // });
-            // const octokit = new Octokit({
-            //     auth: userToken,
-            //     userAgent: 'jadelyyy',
-            //     log: {
-            //         debug: () => {},
-            //         info: () => {},
-            //         warn: console.warn,
-            //         error: console.error
-            //     },
-            //     request: {
-            //         agent: undefined,
-            //         fetch: undefined,
-            //         timeout: 0
-            //     }
-            // });
             
             const {data: issues} = yield octokit.issues.listForRepo({
                 owner: repoOwner,
@@ -100,7 +94,6 @@ function run () {
             var firstResponseTimes = [];
             var firstResponseTime;
             var issue, issueNumber, issueCreationTime;
-            var numComments;
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
                 issueNumber = issue.number;
@@ -109,10 +102,15 @@ function run () {
                 console.log('issue created at: ' + issueCreationTime);
                 firstResponseTime = yield getFirstResponseTime(octokit, repoOwner, repoName, issueNumber);
                 console.log('firstResponseTime: ' + firstResponseTime);
-                firstResponseTimes.push(yield getDifference(issueCreationTime, firstResponseTime));
+                if(firstResponseTime != null) {
+                    firstResponseTimes.push(yield getDifference(issueCreationTime, firstResponseTime));
+                }
             }
             var averageResponseTime = getAverage(firstResponseTimes);
             console.log('\naverageReponseTime: ' + averageResponseTime);
+
+            yield createIssue(octokit, repoOwner, repoName, averageResponseTime);
+
         } catch(err) {
             console.log(err);
         }
