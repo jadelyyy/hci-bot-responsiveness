@@ -36,7 +36,7 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
                 commentCreationTime = new Date(comments[i].created_at);
                 console.log('commentCreationTime: ' + commentCreationTime);
                 console.log('difference: ' + (commentCreationTime - earliestCreationTime));
-                if(commentCreationTime - earliestCreationTime > 0) {
+                if(commentCreationTime.getTime() < earliestCreationTime.getTime()) {
                     console.log('diff > 0');
                     earliestCreationTime = commentCreationTime;
                 }
@@ -44,6 +44,24 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
             return earliestCreationTime;
         }
     });
+}
+
+// assume timeB later than timeA
+function getDifference(timeA, timeB) {
+    var difference = timeB - timeA;
+    // 1000 milliseconds in 1 second, 60 seconds in 1 minute
+    var differenceInMinutes = Math.floor((difference/1000)/60);
+    console.log('differenceInMinutes: ' + differenceInMinutes);
+    console.log(typeof(differenceInMinutes));
+    return differenceInMinutes;
+}
+
+function getAverage(times) {
+    var sum = 0;
+    for (var i = 0; i < times.length; i++) {
+        sum += times[i];
+    }
+    return sum/times.length;
 }
 
 function run () {
@@ -86,13 +104,15 @@ function run () {
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
                 issueNumber = issue.number;
-                issueCreationTime = issue.created_at;
-                console.log('current issueID: ' + issueNumber);
+                issueCreationTime = new Date(issue.created_at);
+                console.log('\ncurrent issueID: ' + issueNumber);
                 console.log('issue created at: ' + issueCreationTime);
                 firstResponseTime = yield getFirstResponseTime(octokit, repoOwner, repoName, issueNumber);
                 console.log('firstResponseTime: ' + firstResponseTime);
+                firstResponseTimes.push(yield getDifference(issueCreationTime, firstResponseTime));
             }
-
+            var averageResponseTime = getAverage(firstResponseTimes);
+            console.log('\naverageReponseTime: ' + averageResponseTime);
         } catch(err) {
             console.log(err);
         }
