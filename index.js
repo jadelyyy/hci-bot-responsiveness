@@ -33,10 +33,25 @@ function run () {
             const repoOwner = 'jadelyyy';
 
             // var octokit = new github.GitHub(userToken);
-            var octokit = new Octokit({
-                auth: userToken
+            // var octokit = new Octokit({
+            //     auth: userToken
+            // });
+            const octokit = new Octokit({
+                auth: userToken,
+                userAgent: 'jadelyyy',
+                log: {
+                    debug: () => {},
+                    info: () => {},
+                    warn: console.warn,
+                    error: console.error
+                },
+                request: {
+                    agent: undefined,
+                    fetch: undefined,
+                    timeout: 0
+                }
             });
-
+            
             const {data: issues} = yield octokit.issues.listForRepo({
                 owner: repoOwner,
                 repo: repoName,
