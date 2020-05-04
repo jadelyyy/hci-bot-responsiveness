@@ -26,7 +26,7 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
 }
 
 function run () {
-    // return __awaiter(this, void 0, void 0, function* () {
+    return __awaiter(this, void 0, void 0, function* () {
         try {
             const userToken  = core.getInput('repo-token');
             const repoName = core.getInput('repo-name');
@@ -73,7 +73,7 @@ function run () {
         } catch(err) {
             console.log(err);
         }
-    // });
+    });
 }
 
 run();
