@@ -24,9 +24,9 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
         // });
 
         const {data: issue} = yield octokit.issues.get({
-            repoOwner,
-            repoName,
-            issueID
+            owner: repoOwner,
+            repo: repoName,
+            issue_number: issueID
         });
 
         console.log('in function comment url: ' + issue.comments_url);
