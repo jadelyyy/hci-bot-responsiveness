@@ -32,9 +32,7 @@ function run () {
             const repoName = core.getInput('repo-name');
             const repoOwner = 'jadelyyy';
 
-            // var octokit = new github.GitHub(userToken);
-
-            var octokit = new github.GitHub('c46e1b5dbd050e18a068b4e22c65424e90ebda84');
+            var octokit = new github.GitHub(userToken);
 
             const {data: issues} = yield octokit.issues.listForRepo({
                 owner: repoOwner,
