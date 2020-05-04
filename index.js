@@ -21,8 +21,8 @@ function run () {
             var octokit = new github.GitHub(userToken);
 
             const {status, data: issues} = yield octokit.issues.listForRepo({
-                repoOwner,
-                repoName,
+                owner: repoOwner,
+                repo: repoName,
             });
 
             // if (status !== 200) {
