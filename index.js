@@ -52,7 +52,7 @@ function run () {
             //     }
             // });
             
-            const {data: issues} = async octokit.issues.listForRepo({
+            const {data: issues} = yield octokit.issues.listForRepo({
                 owner: repoOwner,
                 repo: repoName,
             });
@@ -66,7 +66,7 @@ function run () {
                 issue = issues[i];
                 issueID = issue.id;
                 console.log('current issueID: ' + issueID);
-                numComments = async getIssueComments(octokit, repoOwner, repoName, issueID);
+                numComments = yield getIssueComments(octokit, repoOwner, repoName, issueID);
                 console.log('numComments: ' + numComments);
             }
 
