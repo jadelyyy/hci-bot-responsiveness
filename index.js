@@ -27,7 +27,7 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
         //     issueID
         // });
 
-        console.log('in function numComments: ' + comments.);
+        console.log('in function numComments: ' + comments);
         return comments.length;
     });
 }
