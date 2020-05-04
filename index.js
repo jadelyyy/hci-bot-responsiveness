@@ -9,7 +9,7 @@ function run () {
 
     var octokit = new github.GitHub(userToken);
 
-    const {stats, data: issues} = octokit.issues.listForRepo({
+    const {status, data: issues} = octokit.issues.listForRepo({
         repoOwner,
         repoName,
     });
