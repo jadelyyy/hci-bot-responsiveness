@@ -30,7 +30,7 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
         });
 
         console.log('in function comment url: ' + issue.comments_url);
-        return comments.length;
+        return issue.comments_url
     });
 }
 
