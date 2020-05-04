@@ -23,14 +23,26 @@ function getIssueComments(octokit, repoOwner, repoName, issueNumber) {
             issue_number: issueNumber
         });
 
-        // const {data: issue} = yield octokit.issues.get({
-        //     owner: repoOwner,
-        //     repo: repoName,
-        //     issue_number: issueID
-        // });
-
         console.log('in function num comments' + comments.length);
-        return comments.length;
+
+        // return immediately if issue has no comments
+        if(comments.length == 0) {
+            console.log('no comments at all');
+            return 0;
+        } else {
+            var commentCreationTime;
+            var earliestCreationTime = new Date(comments[0].created_at);
+            for (var i = 0; i < comments.length; i++) {
+                commentCreationTime = new Date(comments.created_at);
+                console.log('commentCreationTime: ' + commentCreationTime);
+                console.log('difference: ' + (commentCreationTime - earliestCreationTime));
+                if(commentCreationTime - earliestCreationTime > 0) {
+                    console.log('diff > 0');
+                    earliestCreationTime = commentCreationTime;
+                }
+            }
+            return earliestCreationTime;
+        }
     });
 }
 
@@ -68,15 +80,17 @@ function run () {
 
             console.log('num issues: ' + issues.length);
 
-            var issue;
-            var issueNumber;
+            var firstResponseTime, firstResponseTimes;
+            var issue, issueNumber, issueCreationTime;
             var numComments;
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
                 issueNumber = issue.number;
+                issueCreationTime = issue.created_at;
                 console.log('current issueID: ' + issueNumber);
-                numComments = yield getIssueComments(octokit, repoOwner, repoName, issueNumber);
-                console.log('numComments: ' + numComments);
+                console.log('issue created at: ' + issueCreationTime);
+                firstResponseTime = yield getFirstResponseTime(octokit, repoOwner, repoName, issueNumber);
+                console.log('firstResponseTime: ' + firstResponseTime);
             }
 
         } catch(err) {
