@@ -26,33 +26,33 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
 }
 
 function run () {
-    return __awaiter(this, void 0, void 0, function* () {
+    // return __awaiter(this, void 0, void 0, function* () {
         try {
             const userToken  = core.getInput('repo-token');
             const repoName = core.getInput('repo-name');
             const repoOwner = 'jadelyyy';
 
-            // var octokit = new github.GitHub(userToken);
+            var octokit = new github.GitHub(userToken);
             // var octokit = new Octokit({
             //     auth: userToken
             // });
-            const octokit = new Octokit({
-                auth: userToken,
-                userAgent: 'jadelyyy',
-                log: {
-                    debug: true,
-                    info: () => {},
-                    warn: console.warn,
-                    error: console.error
-                },
-                request: {
-                    agent: undefined,
-                    fetch: undefined,
-                    timeout: 0
-                }
-            });
+            // const octokit = new Octokit({
+            //     auth: userToken,
+            //     userAgent: 'jadelyyy',
+            //     log: {
+            //         debug: () => {},
+            //         info: () => {},
+            //         warn: console.warn,
+            //         error: console.error
+            //     },
+            //     request: {
+            //         agent: undefined,
+            //         fetch: undefined,
+            //         timeout: 0
+            //     }
+            // });
             
-            const {data: issues} = yield octokit.issues.listForRepo({
+            const {data: issues} = async octokit.issues.listForRepo({
                 owner: repoOwner,
                 repo: repoName,
             });
@@ -66,14 +66,14 @@ function run () {
                 issue = issues[i];
                 issueID = issue.id;
                 console.log('current issueID: ' + issueID);
-                numComments = yield getIssueComments(octokit, repoOwner, repoName, issueID);
+                numComments = async getIssueComments(octokit, repoOwner, repoName, issueID);
                 console.log('numComments: ' + numComments);
             }
 
         } catch(err) {
             console.log(err);
         }
-    });
+    // });
 }
 
 run();
