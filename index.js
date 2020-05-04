@@ -33,7 +33,7 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
             var commentCreationTime;
             var earliestCreationTime = new Date(comments[0].created_at);
             for (var i = 0; i < comments.length; i++) {
-                commentCreationTime = new Date(comments.created_at);
+                commentCreationTime = new Date(comments[i].created_at);
                 console.log('commentCreationTime: ' + commentCreationTime);
                 console.log('difference: ' + (commentCreationTime - earliestCreationTime));
                 if(commentCreationTime - earliestCreationTime > 0) {
