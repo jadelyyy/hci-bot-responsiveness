@@ -11,6 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
+function getIssueComments(octokit, repoOwner, repoName, issueID) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log('getting comments...\n');
+        const {data: comments} = yield octokit.issues.listComments({
+            owner: repoOwner,
+            repo: repoName,
+            issue_number: issueID,
+        });
+
+        console.log('in function numComments: ' + comments.length);
+        return comments.length;
+    });
+}
+
 function run () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -20,7 +34,7 @@ function run () {
 
             var octokit = new github.GitHub(userToken);
 
-            const {data: issues} = await octokit.issues.listForRepo({
+            const {data: issues} = yield octokit.issues.listForRepo({
                 owner: repoOwner,
                 repo: repoName,
             });
@@ -28,10 +42,14 @@ function run () {
             console.log('num issues: ' + issues.length);
 
             var issue;
+            var issueID;
             var numComments;
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
-                numComments = getIssueComments()
+                issueID = issue.id;
+                console.log('current issueID: ' + issueID);
+                numComments = yield getIssueComments(octokit, repoOwner, repoName, issueID);
+                console.log('numComments: ' + numComments);
             }
 
         } catch(err) {
