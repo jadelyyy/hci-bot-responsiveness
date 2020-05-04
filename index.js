@@ -13,7 +13,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 
 function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('getting comments...\n');
         // const userToken  = core.getInput('repo-token');
         // var newOctokit = new github.GitHub(userToken);
         // console.log(typeof(issueID));
@@ -22,8 +21,6 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
             repo: repoName,
             issue_number: issueNumber
         });
-
-        console.log('in function num comments' + comments.length);
 
         // return immediately if issue has no comments
         if(comments.length == 0) {
@@ -35,7 +32,7 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
             for (var i = 0; i < comments.length; i++) {
                 commentCreationTime = new Date(comments[i].created_at);
                 console.log('commentCreationTime: ' + commentCreationTime);
-                console.log('difference: ' + (commentCreationTime - earliestCreationTime));
+                // console.log('difference: ' + (commentCreationTime - earliestCreationTime));
                 if(commentCreationTime.getTime() < earliestCreationTime.getTime()) {
                     console.log('diff > 0');
                     earliestCreationTime = commentCreationTime;
@@ -48,11 +45,13 @@ function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
 
 // assume timeB later than timeA
 function getDifference(timeA, timeB) {
+    console.log('timeA/issueCreationTime: ' + timeA);
+    console.log('timeB/firstResponseTime: ' + timeB);
     var difference = timeB - timeA;
+    console.log('difference: ' + difference);
     // 1000 milliseconds in 1 second, 60 seconds in 1 minute
     var differenceInMinutes = Math.floor((difference/1000)/60);
     console.log('differenceInMinutes: ' + differenceInMinutes);
-    console.log(typeof(differenceInMinutes));
     return differenceInMinutes;
 }
 
