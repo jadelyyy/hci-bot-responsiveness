@@ -16,20 +16,20 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
         console.log('getting comments...\n');
         // const userToken  = core.getInput('repo-token');
         // var newOctokit = new github.GitHub(userToken);
-        console.log(typeof(issueID));
-        const {data: comments} = yield octokit.issues.listComments({
-            owner: repoOwner,
-            repo: repoName,
-            issue_number: parseInt(issueID)
-        });
-
-        // const {data: issue} = yield octokit.issues.get({
-        //     repoOwner,
-        //     repoName,
-        //     issueID
+        // console.log(typeof(issueID));
+        // const {data: comments} = yield octokit.issues.listComments({
+        //     owner: repoOwner,
+        //     repo: repoName,
+        //     issue_number: parseInt(issueID)
         // });
 
-        console.log('in function numComments: ' + comments);
+        const {data: issue} = yield octokit.issues.get({
+            repoOwner,
+            repoName,
+            issueID
+        });
+
+        console.log('in function comment url: ' + issue.comments_url);
         return comments.length;
     });
 }
