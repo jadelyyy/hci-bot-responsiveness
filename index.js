@@ -20,16 +20,20 @@ function run () {
 
             var octokit = new github.GitHub(userToken);
 
-            const {status, data: issues} = yield octokit.issues.listForRepo({
+            const {data: issues} = await octokit.issues.listForRepo({
                 owner: repoOwner,
                 repo: repoName,
             });
 
-            // if (status !== 200) {
-            //     throw new Error(`Received unexpected API status code ${status}`);
-            // }
-
             console.log('num issues: ' + issues.length);
+
+            var issue;
+            var numComments;
+            for (var i = 0; i < issues.length; i++) {
+                issue = issues[i];
+                numComments = getIssueComments()
+            }
+
         } catch(err) {
             console.log(err);
         }
