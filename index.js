@@ -9,10 +9,14 @@ function run () {
 
     var octokit = new github.GitHub(userToken);
 
-    const {data: issues} = octokit.issues.listForRepo({
+    const {stats, data: issues} = octokit.issues.listForRepo({
         repoOwner,
         repoName,
     });
+
+    if (status !== 200) {
+        throw new Error(`Received unexpected API status code ${status}`);
+    }
 
     console.log('num issues: ' + issues.length);
 }
