@@ -14,15 +14,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 function getIssueComments(octokit, repoOwner, repoName, issueID) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('getting comments...\n');
-        const userToken  = core.getInput('repo-token');
-        var newOctokit = new github.GitHub(userToken);
-        const {data: comments} = yield newOctokit.issues.listComments({
+        // const userToken  = core.getInput('repo-token');
+        // var newOctokit = new github.GitHub(userToken);
+        const {data: comments} = yield octokit.issues.listCommentsForRepo({
             owner: repoOwner,
             repo: repoName,
-            issue_number: issueID,
         });
 
-        console.log('in function numComments: ' + comments.length);
+        // const {data: issue} = yield octokit.issues.get({
+        //     repoOwner,
+        //     repoName,
+        //     issueID
+        // });
+
+        console.log('in function numComments: ' + comments.);
         return comments.length;
     });
 }
