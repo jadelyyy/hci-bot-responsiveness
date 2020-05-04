@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
-function getIssueComments(octokit, repoOwner, repoName, issueNumber) {
+function getFirstResponseTime(octokit, repoOwner, repoName, issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('getting comments...\n');
         // const userToken  = core.getInput('repo-token');
