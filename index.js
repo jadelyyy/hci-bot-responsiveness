@@ -40,7 +40,7 @@ function run () {
                 auth: userToken,
                 userAgent: 'jadelyyy',
                 log: {
-                    debug: () => {},
+                    debug: true,
                     info: () => {},
                     warn: console.warn,
                     error: console.error
