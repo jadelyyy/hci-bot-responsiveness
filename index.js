@@ -98,7 +98,8 @@ function run () {
 
             console.log('num issues: ' + issues.length);
 
-            var firstResponseTime, firstResponseTimes;
+            var firstResponseTimes = [];
+            var firstResponseTime;
             var issue, issueNumber, issueCreationTime;
             var numComments;
             for (var i = 0; i < issues.length; i++) {
