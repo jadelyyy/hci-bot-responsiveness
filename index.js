@@ -8,9 +8,7 @@ function run () {
     console.log('user token: ' + userToken);
     const repoName = core.getInput('repo-name');
     var github = new Github({
-        // 'token': userToken
-        'username': 'jadelyyy',
-        'password': 'HCI-dem0'
+        'token': userToken
     });
     var user = github.getUser();
     var userRepo = github.getRepo(user, repoName);
