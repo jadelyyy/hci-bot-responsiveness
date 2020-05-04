@@ -11,26 +11,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
-function getIssueComments(octokit, repoOwner, repoName, issueID) {
+function getIssueComments(octokit, repoOwner, repoName, issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('getting comments...\n');
         // const userToken  = core.getInput('repo-token');
         // var newOctokit = new github.GitHub(userToken);
         // console.log(typeof(issueID));
-        // const {data: comments} = yield octokit.issues.listComments({
-        //     owner: repoOwner,
-        //     repo: repoName,
-        //     issue_number: parseInt(issueID)
-        // });
-
-        const {data: issue} = yield octokit.issues.get({
+        const {data: comments} = yield octokit.issues.listComments({
             owner: repoOwner,
             repo: repoName,
-            issue_number: issueID
+            issue_number: issueNumber
         });
 
-        console.log('in function comment url: ' + issue.comments_url);
-        return issue.comments_url
+        // const {data: issue} = yield octokit.issues.get({
+        //     owner: repoOwner,
+        //     repo: repoName,
+        //     issue_number: issueID
+        // });
+
+        console.log('in function num comments' + comments.length);
+        return comments.length;
     });
 }
 
@@ -69,13 +69,13 @@ function run () {
             console.log('num issues: ' + issues.length);
 
             var issue;
-            var issueID;
+            var issueNumber;
             var numComments;
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
-                issueID = issue.id;
-                console.log('current issueID: ' + issueID);
-                numComments = yield getIssueComments(octokit, repoOwner, repoName, issueID);
+                issueNumber = issue.number;
+                console.log('current issueID: ' + issueNumber);
+                numComments = yield getIssueComments(octokit, repoOwner, repoName, issueNumber);
                 console.log('numComments: ' + numComments);
             }
 
