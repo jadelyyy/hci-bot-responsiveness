@@ -16,9 +16,11 @@ function getIssueComments(octokit, repoOwner, repoName, issueID) {
         console.log('getting comments...\n');
         // const userToken  = core.getInput('repo-token');
         // var newOctokit = new github.GitHub(userToken);
-        const {data: comments} = yield octokit.issues.listCommentsForRepo({
+        console.log('typeof', issueID);
+        const {data: comments} = yield octokit.issues.listComments({
             owner: repoOwner,
             repo: repoName,
+            issue_number: parseInt(issueID)
         });
 
         // const {data: issue} = yield octokit.issues.get({
