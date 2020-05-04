@@ -14,6 +14,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 function getIssueComments(octokit, repoOwner, repoName, issueID) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log('getting comments...\n');
+        const userToken  = core.getInput('repo-token');
         var newOctokit = new github.GitHub(userToken);
         const {data: comments} = yield newOctokit.issues.listComments({
             owner: repoOwner,
