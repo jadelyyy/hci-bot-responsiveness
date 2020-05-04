@@ -63,16 +63,18 @@ function getAverage(times) {
 }
 
 function createIssue(octokit, repoOwner, repoName, averageResponseTime) {
-    const issueBody = `Great job! This month, your repository's average response time has decreased 5% since last month!\n` + 
-                    `At an average of ${averageResponseTime} hours, your response time was better than 70% of the communities on Github!`;
-    const {data: issue} = yield octokit.issues.create({
-        owner: repoOwner,
-        repo: repoName,
-        title: 'Montly Responsiveness Update',
-        body: issueBody
-    })
+    return __awaiter(this, void 0, void 0, function* () {
+        const issueBody = `Great job! This month, your repository's average response time has decreased 5% since last month!\n` + 
+                        `At an average of ${averageResponseTime} hours, your response time was better than 70% of the communities on Github!`;
+        const {data: issue} = yield octokit.issues.create({
+            owner: repoOwner,
+            repo: repoName,
+            title: 'Montly Responsiveness Update',
+            body: issueBody
+        })
 
-    console.log('issueBody: \n' + issue.body);
+        console.log('issueBody: \n' + issue.body);
+    });
 }
 
 function run () {
