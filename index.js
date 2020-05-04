@@ -54,18 +54,29 @@ function getDifference(timeA, timeB) {
     return differenceInMinutes;
 }
 
-function getAverage(times) {
+function getAverageTimeInHours(times) {
     var sum = 0;
     for (var i = 0; i < times.length; i++) {
         sum += times[i];
     }
-    return sum/times.length;
+    var averageTimeInMinutes = sum/times.length;
+    var hours = Math.floor(averageTimeInMinutes/60);
+    var minutes = averageTimeInMinutes % 60;
+    if (minutes > 30) {
+        return hours + 1;
+    } else {
+        return hours;
+    }
 }
 
 function createIssue(octokit, repoOwner, repoName, averageResponseTime) {
     return __awaiter(this, void 0, void 0, function* () {
-        const issueBody = `Great job! This month, your repository's average response time has decreased 5% since last month!\n` + 
+        var issueBody = `Great job! This month, your repository's average response time has decreased 5% since last month!\n` + 
                         `At an average of ${averageResponseTime} hours, your response time was better than 70% of the communities on Github!`;
+        if (averageResponseTime == 0) {
+            `Great job! This month, your repository's average response time has decreased 5% since last month!\n` + 
+            `At an average of less than 1 hour, your response time was better than 90% of the communities on Github!`;
+        }
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
@@ -108,9 +119,8 @@ function run () {
                     firstResponseTimes.push(yield getDifference(issueCreationTime, firstResponseTime));
                 }
             }
-            var averageResponseTime = getAverage(firstResponseTimes);
+            var averageResponseTime = getAverageTimeInHours(firstResponseTimes);
             console.log('\naverageReponseTime: ' + averageResponseTime);
-
             yield createIssue(octokit, repoOwner, repoName, averageResponseTime);
 
         } catch(err) {
