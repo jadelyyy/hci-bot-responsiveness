@@ -133,7 +133,7 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
                     continue;
                 }
                 console.log('not null..adding..');
-                firstResponseTimes.push(yield getDifference(issueCreationDate, firstResponseDate));
+                firstResponseTimes.push(getDifference(issueCreationDate, firstResponseDate));
             }
             console.log('firstResponseTimes: ' + firstResponseTimes);
             return firstResponseTimes;
