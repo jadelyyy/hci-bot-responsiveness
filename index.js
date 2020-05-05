@@ -50,7 +50,7 @@ function getDifference(dateA, dateB) {
 }
 
 function getAverageTimeInHours(times) {
-    if(times.length == 0 {
+    if(times.length == 0) {
         return null;
     }
     var sum = 0;
