@@ -122,7 +122,7 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
             issueCreationDate = new Date(issue.created_at);
             console.log('\ncurrent issueID: ' + issueNumber);
             console.log('issue created at: ' + issueCreationDate);
-            if(!isWithinMonth(issueCreationDate)) {
+            if(!isWithinMonth(issueCreationDate, baseDate)) {
                 continue;
             }
             firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
