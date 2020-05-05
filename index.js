@@ -170,7 +170,7 @@ function run () {
             if (baseDate.getMonth() == 1) {
                 var prevMonth = 12;
             } else {
-                var prevMonth = baseMonth - 1;
+                var prevMonth = baseDate.getMonth() - 1;
             }
             var prevDay = Math.max(month_map[prevMonth] - (31 - baseDate.getDate()) + 1, 1);
             if(prevMonth == 12) {
