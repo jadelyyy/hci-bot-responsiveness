@@ -50,6 +50,9 @@ function getDifference(dateA, dateB) {
 }
 
 function getAverageTimeInHours(times) {
+    if(times.length == 0 {
+        return null;
+    }
     var sum = 0;
     for (var i = 0; i < times.length; i++) {
         sum += times[i];
@@ -64,16 +67,41 @@ function getAverageTimeInHours(times) {
     }
 }
 
-function createIssue(octokit, repoOwner, repoName, averageResponseTime) {
+function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
     return __awaiter(this, void 0, void 0, function* () {
-        var issueBody = `Great job! This month, your repository's average response time has decreased 5% since last month!` + 
-                        `At an average of ${averageResponseTime} hours, your response time was better than 70% of the communities on Github!`;
+        var issueBody;
+        if (currTime == null) {
+            issueBody = `There were no issues created this month.`;
+        } else if (prevTime == null) {
+            issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
+                        `your repository's response time was better than 70% of the communities on Github!`;
+        } else {
+            var difference = currTime - prevTime;
+            var percentDifference = Math.floor(Math.abs(difference)/prevTime * 100)
+
+            var change, initMessage;
+            // response time decreased
+            if(difference > 0) {
+                var change = 'increased';
+                var initMessage = '';
+            }
+            if(difference == 0){
+                var change = 'increased';
+                var initMessage = 'Not bad! ';
+            }
+            else {
+                var initMessage = 'Great job! '
+                var change = 'decreased';
+            }
+            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
+                            `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
+        }
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
             title: 'Monthly Responsiveness Update',
             body: issueBody
-        })
+        });
     });
 }
 
@@ -164,8 +192,7 @@ function run () {
             console.log('number of times: ' + currMonthResponseTimes.length);
         
             var currMonthAveResponseTime = getAverageTimeInHours(currMonthResponseTimes);
-            console.log('currMonthAveResponeTimes: ' + currMonthAveResponseTime);
-            console.log('\naverageReponseTime: ' + currMonthAveResponseTime);
+            console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
 
             if (baseDate.getMonth() == 1) {
                 var prevMonth = 12;
@@ -180,7 +207,10 @@ function run () {
             baseDate.setMonth(prevMonth);
             console.log('new BaseDate: ' + baseDate);
 
-            yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime);
+            var prevMonthResponseTimes = yield getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
+            var prevMonthAveResponseTime = getAverageTimeInHours(prevMonthResponseTimes);
+
+            yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime, prevMonthAveResponseTime);
 
         } catch(err) {
             console.log(err);
