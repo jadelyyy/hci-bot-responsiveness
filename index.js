@@ -127,7 +127,7 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
             }
             firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
             console.log('firstResponseDate: ' + firstResponseDate);
-            if(!firstResponseDate) {
+            if(firstResponseDate) {
                 console.log('adding...');
                 firstResponseTimes.push(yield getDifference(issueCreationDate, firstResponseDate));
             }
