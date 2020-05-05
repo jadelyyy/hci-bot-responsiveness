@@ -77,33 +77,31 @@ function createIssue(octokit, repoOwner, repoName, averageResponseTime) {
     });
 }
 
-function isWithinMonth(creationDate) {
+function isWithinMonth(creationDate, baseDate) {
     try {
-        var currDate = new Date(); 
-
-        if (currDate.getYear() % 4 == 0) {
+        if (baseDate.getYear() % 4 == 0) {
             month_map[1] = 29; 
         }
 
         var withinMonth = false; 
         var prevMonth = false; 
         //  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
-        if (currDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == currDate.getYear()) {
+        if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear()) {
             withinMonth = true;
         }
-        else if (creationDate.getYear() != currDate.getYear()) {
-            prevMonth = (creationDate.getYear() == currDate.getYear()-1) && currDate.getMonth() == 0 && creationDate.getMonth() == 11; 
+        else if (creationDate.getYear() != baseDate.getYear()) {
+            prevMonth = (creationDate.getYear() == baseDate.getYear()-1) && baseDate.getMonth() == 0 && creationDate.getMonth() == 11; 
             
         } else { // year is the same, month is diff 
-            prevMonth = (currDate.getMonth() - creationDate.getMonth()) <= 1; // check if created_at is less than 1 month from current moment 
+            prevMonth = (baseDate.getMonth() - creationDate.getMonth()) <= 1; // check if created_at is less than 1 month from current moment 
         }
-        var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - currDate.getDate()) +1, 1);
+        var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - baseDate.getDate()) +1, 1);
         if (!withinMonth) {
             withinMonth = prevMonth && creationDate.getDate() >= dateMinimum;
         }
         
-        console.log("within month:", withinMonth, " , creation date:", creationDate, ", curr date: ", currDate, ", prev month: ", prevMonth, " , date min:", dateMinimum);
-        console.log("creation month: ", creationDate.getMonth(), ", month map value:", month_map[creationDate.getMonth()], ", curr day:", currDate.getDate());
+        // console.log("within month:", withinMonth, " , creation date:", creationDate, ", base date: ", baseDate, ", prev month: ", prevMonth, " , date min:", dateMinimum);
+        // console.log("creation month: ", creationDate.getMonth(), ", month map value:", month_map[creationDate.getMonth()], ", base day:", baseDate.getDate());
         
         console.log('withinMonth: ' + withinMonth);
         return withinMonth;
@@ -113,7 +111,7 @@ function isWithinMonth(creationDate) {
     }
 }
 
-function getResponseTimes(octokit, repoOwner, repoName, issues) {
+function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
     var firstResponseTimes = [];
     var firstResponseDate;
     var issue, issueNumber, issueCreationDate;
@@ -151,7 +149,8 @@ function run () {
 
             console.log('num issues: ' + issues.length);
 
-            var currMonthResponseTimes = getResponseTimes(octokit, repoOwner, repoName, issues);
+            var baseDate = new Date();
+            var currMonthResponseTimes = getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
         
             var currMonthAveResponseTime = getAverageTimeInHours(currMonthResponseTimes);
             console.log('\naverageReponseTime: ' + currMonthAveResponseTime);
