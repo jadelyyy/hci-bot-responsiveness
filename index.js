@@ -70,32 +70,34 @@ function getAverageTimeInHours(times) {
 function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
-        if (currTime == null) {
-            issueBody = `There were no issues created this month.`;
-        } else if (prevTime == null) {
-            issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
-                        `your repository's response time was better than 70% of the communities on Github!`;
-        } else {
-            var difference = currTime - prevTime;
-            var percentDifference = Math.floor(Math.abs(difference)/prevTime * 100)
+        // if (currTime == null) {
+        //     issueBody = `There were no issues created this month.`;
+        // } else if (prevTime == null) {
+        //     issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
+        //                 `your repository's response time was better than 70% of the communities on Github!`;
+        // } else {
+        //     var difference = currTime - prevTime;
+        //     var percentDifference = Math.floor(Math.abs(difference)/prevTime * 100)
 
-            var change, initMessage;
-            // response time decreased
-            if(difference > 0) {
-                var change = 'increased';
-                var initMessage = '';
-            }
-            if(difference == 0){
-                var change = 'increased';
-                var initMessage = 'Not bad! ';
-            }
-            else {
-                var initMessage = 'Great job! '
-                var change = 'decreased';
-            }
-            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
-                            `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
-        }
+        //     var change, initMessage;
+        //     // response time decreased
+        //     if(difference > 0) {
+        //         var change = 'increased';
+        //         var initMessage = '';
+        //     }
+        //     if(difference == 0){
+        //         var change = 'increased';
+        //         var initMessage = 'Not bad! ';
+        //     }
+        //     else {
+        //         var initMessage = 'Great job! '
+        //         var change = 'decreased';
+        //     }
+        //     var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
+        //                     `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
+        // }
+        issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
+                    `your repository's response time was better than 70% of the communities on Github!`;
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
