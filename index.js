@@ -138,9 +138,9 @@ function run () {
                 issueCreationDate = new Date(issue.created_at);
                 console.log('\ncurrent issueID: ' + issueNumber);
                 console.log('issue created at: ' + issueCreationDate);
-                if(!isWithinMonth(issueCreationDate)) {
-                    continue;
-                }
+                // if(!isWithinMonth(issueCreationDate)) {
+                //     continue;
+                // }
                 firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
                 console.log('firstResponseDate: ' + firstResponseDate);
                 if(firstResponseDate != null) {
