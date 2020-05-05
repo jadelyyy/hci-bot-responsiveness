@@ -113,28 +113,33 @@ function isWithinMonth(creationDate, baseDate) {
 
 function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
     return __awaiter(this, void 0, void 0, function* () {
-        var firstResponseTimes = [];
-        var firstResponseDate;
-        var issue, issueNumber, issueCreationDate;
-        for (var i = 0; i < issues.length; i++) {
-            issue = issues[i];
-            issueNumber = issue.number;
-            issueCreationDate = new Date(issue.created_at);
-            console.log('\ncurrent issueID: ' + issueNumber);
-            console.log('issue created at: ' + issueCreationDate);
-            if(!isWithinMonth(issueCreationDate, baseDate)) {
-                continue;
+        try {
+            var firstResponseTimes = [];
+            var firstResponseDate;
+            var issue, issueNumber, issueCreationDate;
+            for (var i = 0; i < issues.length; i++) {
+                issue = issues[i];
+                issueNumber = issue.number;
+                issueCreationDate = new Date(issue.created_at);
+                console.log('\ncurrent issueID: ' + issueNumber);
+                console.log('issue created at: ' + issueCreationDate);
+                if(!isWithinMonth(issueCreationDate, baseDate)) {
+                    continue;
+                }
+                firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
+                console.log('firstResponseDate: ' + firstResponseDate);
+                if(firstResponseDate === null) {
+                    console.log('skipping');
+                    continue;
+                }
+                console.log('not null..adding..');
+                firstResponseTimes.push(yield getDifference(issueCreationDate, firstResponseDate));
             }
-            firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
-            console.log('firstResponseDate: ' + firstResponseDate);
-            if(firstResponseDate === null) {
-                console.log('skipping');
-                continue;
-            }
-            console.log('not null..adding..');
-            firstResponseTimes.push(yield getDifference(issueCreationDate, firstResponseDate));
+            console.log('firstResponseTimes: ' + firstResponseTimes);
+            return firstResponseTimes;
+        } catch(err) {
+            console.log(err);
         }
-        return firstResponseTimes;
     });
 }
 
@@ -156,10 +161,11 @@ function run () {
 
             var baseDate = new Date();
             var currMonthResponseTimes = getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
+            console.log('currMonthResponseTimes Array: ' + currMonthResponseTimes);
+            console.log('number of times: ' + currMonthResponseTimes.length);
         
             var currMonthAveResponseTime = getAverageTimeInHours(currMonthResponseTimes);
             console.log('currMonthAveResponeTimes: ' + currMonthAveResponseTime);
-            console.log('number of times: ' + currMonthResponseTimes.length);
             console.log('\naverageReponseTime: ' + currMonthAveResponseTime);
 
             yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime);
