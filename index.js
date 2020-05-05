@@ -113,6 +113,28 @@ function isWithinMonth(creationDate) {
     }
 }
 
+function getResponseTimes(octokit, repoOwner, repoName, issues) {
+    var firstResponseTimes = [];
+    var firstResponseDate;
+    var issue, issueNumber, issueCreationDate;
+    for (var i = 0; i < issues.length; i++) {
+        issue = issues[i];
+        issueNumber = issue.number;
+        issueCreationDate = new Date(issue.created_at);
+        console.log('\ncurrent issueID: ' + issueNumber);
+        console.log('issue created at: ' + issueCreationDate);
+        if(!isWithinMonth(issueCreationDate)) {
+            continue;
+        }
+        firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
+        console.log('firstResponseDate: ' + firstResponseDate);
+        if(firstResponseDate != null) {
+            firstResponseTimes.push(yield getDifference(issueCreationDate, firstResponseDate));
+        }
+    }
+    return firstResponseTimes;
+}
+
 function run () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -129,27 +151,11 @@ function run () {
 
             console.log('num issues: ' + issues.length);
 
-            var firstResponseTimes = [];
-            var firstResponseDate;
-            var issue, issueNumber, issueCreationDate;
-            for (var i = 0; i < issues.length; i++) {
-                issue = issues[i];
-                issueNumber = issue.number;
-                issueCreationDate = new Date(issue.created_at);
-                console.log('\ncurrent issueID: ' + issueNumber);
-                console.log('issue created at: ' + issueCreationDate);
-                if(!isWithinMonth(issueCreationDate)) {
-                    continue;
-                }
-                firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
-                console.log('firstResponseDate: ' + firstResponseDate);
-                if(firstResponseDate != null) {
-                    firstResponseTimes.push(yield getDifference(issueCreationDate, firstResponseDate));
-                }
-            }
-            var averageResponseTime = getAverageTimeInHours(firstResponseTimes);
-            console.log('\naverageReponseTime: ' + averageResponseTime);
-            yield createIssue(octokit, repoOwner, repoName, averageResponseTime);
+            var currMonthResponseTimes = getResponseTimes(octokit, repoOwner, repoName, issues);
+        
+            var currMonthAveResponseTime = getAverageTimeInHours(currMonthResponseTimes);
+            console.log('\naverageReponseTime: ' + currMonthAveResponseTime);
+            yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime);
 
         } catch(err) {
             console.log(err);
