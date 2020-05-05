@@ -41,7 +41,7 @@ function getFirstResponseDate(octokit, repoOwner, repoName, issueNumber) {
 
 // assume timeB later than timeA
 function getDifference(dateA, dateB) {
-    var difference = dateA - dateB;
+    var difference = dateB - dateA;
     console.log('difference: ' + difference);
     // 1000 milliseconds in 1 second, 60 seconds in 1 minute
     var differenceInMinutes = Math.floor((difference/1000)/60);
@@ -138,9 +138,9 @@ function run () {
                 issueCreationDate = new Date(issue.created_at);
                 console.log('\ncurrent issueID: ' + issueNumber);
                 console.log('issue created at: ' + issueCreationDate);
-                // if(!isWithinMonth(issueCreationDate)) {
-                //     continue;
-                // }
+                if(!isWithinMonth(issueCreationDate)) {
+                    continue;
+                }
                 firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
                 console.log('firstResponseDate: ' + firstResponseDate);
                 if(firstResponseDate != null) {
