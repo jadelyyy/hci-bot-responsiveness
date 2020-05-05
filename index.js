@@ -2,6 +2,8 @@ const { Octokit } = require("@octokit/rest");
 const core = require("@actions/core");
 const github = require("@actions/github");
 
+var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
+
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -13,9 +15,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 
 function getFirstResponseDate(octokit, repoOwner, repoName, issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
-        // const userToken  = core.getInput('repo-token');
-        // var newOctokit = new github.GitHub(userToken);
-        // console.log(typeof(issueID));
         const {data: comments} = yield octokit.issues.listComments({
             owner: repoOwner,
             repo: repoName,
@@ -31,9 +30,7 @@ function getFirstResponseDate(octokit, repoOwner, repoName, issueNumber) {
             var earliestCreationDate = new Date(comments[0].created_at);
             for (var i = 0; i < comments.length; i++) {
                 commentCreationDate = new Date(comments[i].created_at);
-                console.log('commentCreationDate: ' + commentCreationDate);
                 if(commentCreationDate.getTime() < earliestCreationDate.getTime()) {
-                    console.log('diff > 0');
                     earliestCreationDate = commentCreationDate;
                 }
             }
@@ -44,8 +41,6 @@ function getFirstResponseDate(octokit, repoOwner, repoName, issueNumber) {
 
 // assume timeB later than timeA
 function getDifference(dateA, dateB) {
-    console.log('dateA/issueCreationDate: ' + dateA);
-    console.log('dateB/firstResponseDate: ' + dateB);
     var difference = dateA - dateB;
     console.log('difference: ' + difference);
     // 1000 milliseconds in 1 second, 60 seconds in 1 minute
@@ -76,11 +71,9 @@ function createIssue(octokit, repoOwner, repoName, averageResponseTime) {
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
-            title: 'Montly Responsiveness Update',
+            title: 'Monthly Responsiveness Update',
             body: issueBody
         })
-
-        console.log('issueBody: \n' + issue.body);
     });
 }
 
@@ -99,7 +92,7 @@ function isWithinMonth(creationDate) {
             withinMonth = true;
         }
         else if (creationDate.getYear() != currDate.getYear()) {
-            prevMonth = (creationDate.getYear() == currDate.getYear()-1) && currDate.getMonth()==0 && creationDate.getMonth()==11; 
+            prevMonth = (creationDate.getYear() == currDate.getYear()-1) && currDate.getMonth() == 0 && creationDate.getMonth() == 11; 
             
         } else { // year is the same, month is diff 
             prevMonth = (currDate.getMonth() - creationDate.getMonth()) <= 1; // check if created_at is less than 1 month from current moment 
