@@ -160,7 +160,7 @@ function run () {
             console.log('num issues: ' + issues.length);
 
             var baseDate = new Date();
-            var currMonthResponseTimes = getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
+            var currMonthResponseTimes = yield getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
             console.log('currMonthResponseTimes Array: ' + currMonthResponseTimes);
             console.log('number of times: ' + currMonthResponseTimes.length);
         
