@@ -71,6 +71,8 @@ function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
         prevTime = 3;
+        console.log('currTime: ' + currTime);
+        console.log('prevTime: ' + prevTime);
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
