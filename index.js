@@ -123,16 +123,17 @@ function isWithinMonth(creationDate, baseDate) {
         }
         else if (creationDate.getYear() != baseDate.getYear()) {
             // console.log("Creation year is 1 less than base year and base month is january and creation month is december")
+            console.log("creation month is december and base month is january");
             prevMonth = (creationDate.getYear() == baseDate.getYear()-1) && baseDate.getMonth() == 0 && creationDate.getMonth() == 11; 
             
         } else { // year is the same, month is diff 
-            // console.log("Creation month is 1 month or less than base month");
-            var monthDiff = baseDate.getMonth() - creationDate.getMonth();
-            prevMonth =  monthDiff <= 1 && monthDiff >= 0; // check if created_at is less than 1 month from current moment 
+            console.log("Creation month is 1 month before base month");
+            prevMonth =  (baseDate.getMonth() - creationDate.getMonth()) == 1; // check if created_at is less than 1 month from current moment 
         }
         var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - baseDate.getDate()) + 1, 1);
         if (!withinMonth) {
             console.log('creation month is within 1 month');
+            console.log('dateMinimum: ' + dateMinimum);
             withinMonth = prevMonth && creationDate.getDate() >= dateMinimum;
         }
         
