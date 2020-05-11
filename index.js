@@ -220,8 +220,10 @@ function run () {
 
             var prevMonthResponseTimes = yield getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
             var prevMonthAveResponseTime = getAverageTimeInHours(prevMonthResponseTimes);
-            console.log('prevMonthResponseTimes Array: ' + currMonthResponseTimes);
-            console.log('number of prevMonthResponseTimes: ' + currMonthResponseTimes.length);
+            console.log('prevMonthResponseTimes Array: ' + prevMonthResponseTimes);
+            console.log('number of prevMonthResponseTimes: ' + prevMonthResponseTimes.length);
+            console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
+
 
             yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime, prevMonthAveResponseTime);
 
