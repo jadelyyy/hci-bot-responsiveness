@@ -201,7 +201,7 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
         } else {
             return allIssues;
         }
-    }
+    });
 }
 
 function run () {
