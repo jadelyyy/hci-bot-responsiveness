@@ -190,13 +190,16 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
             repo: repoName,
             page: pageNum
         });
+        console.log('issues.length :' + issues.length);
         var issuesLeft = true;
         if(issues.length == 0) {
             console.log('no more issues');
             issuesLeft = false;
         }
         if(issuesLeft) {
+            console.log('pussing issues....');
             allIssues.push(issues);
+            console.log('allIssues.length: ' + allIssues.length);
             return yield getAllIssues(octokit, repoOwner, repoName, allIssues, pageNum + 1);
         } else {
             return allIssues;
@@ -213,7 +216,7 @@ function run () {
 
             var octokit = new github.GitHub(userToken);
 
-            var issues = getAllIssues(octokit, repoOwner, repoName, [], 1);
+            var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
             console.log('Total Number of Issues: ' + issues.length);
 
