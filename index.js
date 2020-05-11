@@ -161,6 +161,7 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
                 issue = issues[i];
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
+                console.log('issue.created_at: ' + issue.created_at);
                 // console.log('\ncurrent issueID: ' + issueNumber);
                 // console.log('issue created at: ' + issueCreationDate);
                 if(!isWithinMonth(issueCreationDate, baseDate)) {
