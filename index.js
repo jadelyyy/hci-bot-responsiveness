@@ -144,6 +144,8 @@ function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
             var firstResponseTimes = [];
             var firstResponseDate;
             var issue, issueNumber, issueCreationDate;
+            var total = 0;
+            var unresponded = 0;
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
                 issueNumber = issue.number;
@@ -151,12 +153,20 @@ function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
                 if(!isWithinMonth(issueCreationDate, baseDate)) {
                     continue;
                 }
+                total += 1;
                 firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
                 if(firstResponseDate) {
                     firstResponseTimes.push(getDifference(issueCreationDate, firstResponseDate));
+                } else {
+                    unresponded += 1;
                 }
             }
-            return firstResponseTimes;
+            // return firstResponseTimes;
+            return {
+                firstResponseTimes: firstResponseTimes,
+                total: total,
+                unresponded: unresponded
+            }
         } catch(err) {
             console.log(err);
         }
@@ -199,11 +209,13 @@ function run () {
 
             var baseDate = new Date();
             console.log('\noriginal baseDate: ' + baseDate);
-            var currMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
-            var currMonthAveResponseTime = getAverageTime(currMonthResponseTimes);
-            console.log('currMonthResponseTimes Array: ' + currMonthResponseTimes);
-            console.log('number of currMonthResponseTimes: ' + currMonthResponseTimes.length);
+            // var currMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+            var currMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+            var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
+            console.log('currMonthResponseTimes Array: ' + currMonthIssuesData.firstResponseTimes);
+            console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
             console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
+            console.log(`${currMonthIssuesData.unresponded}/${currMonthIssuesData.total} unresponded`);
 
             if (baseDate.getMonth() == 1) {
                 var prevMonth = 11;
@@ -219,11 +231,13 @@ function run () {
             baseDate.setMonth(prevMonth);
             console.log('\nnew BaseDate: ' + baseDate);
 
-            var prevMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
-            var prevMonthAveResponseTime = getAverageTime(prevMonthResponseTimes);
-            console.log('prevMonthResponseTimes Array: ' + prevMonthResponseTimes);
-            console.log('number of prevMonthResponseTimes: ' + prevMonthResponseTimes.length);
+            // var prevMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+            var prevMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+            var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
+            console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
+            console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
             console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
+            console.log(`${prevMonthIssuesData.unresponded}/${prevMonthIssuesData.total} unresponded`);
 
 
             yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime, prevMonthAveResponseTime);
