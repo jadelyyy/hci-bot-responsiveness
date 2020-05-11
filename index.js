@@ -49,7 +49,7 @@ function getDifference(dateA, dateB) {
     return differenceInMinutes;
 }
 
-function getAverageTimeInHours(times) {
+function getAverageTime(times) {
     if(times.length == 0) {
         return null;
     }
@@ -60,27 +60,29 @@ function getAverageTimeInHours(times) {
     var averageTimeInMinutes = sum/times.length;
     var hours = Math.floor(averageTimeInMinutes/60);
     var minutes = averageTimeInMinutes % 60;
-    if (minutes > 30) {
-        return hours + 1;
-    } else {
-        return hours;
-    }
+    // if (minutes > 30) {
+    //     return hours + 1;
+    // } else {
+    //     return hours;
+    // }
+    return [hours, minutes]
 }
 
 function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
-        prevTime = 3;
+        prevTime[5, 50];
         console.log('currTime: ' + currTime);
         console.log('prevTime: ' + prevTime);
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
-            issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
+            issueBody = `Great job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
-            var difference = currTime - prevTime;
-            var percentDifference = Math.floor(Math.abs(difference)/prevTime * 100)
+            // var difference = currTime - prevTime;
+            var difference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + currTime[1]);
+            var percentDifference = Math.floor(Math.abs(difference)/(prevTime[0] * 60 + prevTime[1]) * 100)
 
             var change, initMessage;
             // response time decreased
@@ -96,8 +98,8 @@ function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
                 var initMessage = 'Great job! '
                 var change = 'decreased';
             }
-            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
-                            `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
+            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month. ` + 
+                            `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
         }
         // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
         //             `your repository's response time was better than 70% of the communities on Github!`;
@@ -205,7 +207,7 @@ function run () {
             console.log('currMonthResponseTimes Array: ' + currMonthResponseTimes);
             console.log('number of currMonthResponseTimes: ' + currMonthResponseTimes.length);
         
-            var currMonthAveResponseTime = getAverageTimeInHours(currMonthResponseTimes);
+            var currMonthAveResponseTime = getAverageTime(currMonthResponseTimes);
             console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
 
             if (baseDate.getMonth() == 1) {
@@ -217,12 +219,13 @@ function run () {
             if(prevMonth == 11) {
                 baseDate.setYear(baseDate.getYear() - 1)
             }
+
             baseDate.setDate(prevDay);
             baseDate.setMonth(prevMonth);
             console.log('\nnew BaseDate: ' + baseDate);
 
             var prevMonthResponseTimes = yield getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
-            var prevMonthAveResponseTime = getAverageTimeInHours(prevMonthResponseTimes);
+            var prevMonthAveResponseTime = getAverageTime(prevMonthResponseTimes);
             console.log('prevMonthResponseTimes Array: ' + prevMonthResponseTimes);
             console.log('number of prevMonthResponseTimes: ' + prevMonthResponseTimes.length);
             console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
