@@ -183,6 +183,27 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
     });
 }
 
+function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const {data: issues} = yield octokit.issues.listForRepo({
+            owner: repoOwner,
+            repo: repoName,
+            page: pageNum
+        });
+        var issuesLeft = true;
+        if(issues.length == 0) {
+            console.log('no more issues');
+            issuesLeft = false;
+        }
+        if(issuesLeft) {
+            allIssues.push(issues);
+            return yield getAllIssues(octokit, repoOwner, repoName, allIssues, pageNume + 1);
+        } else {
+            return allIssues;
+        }
+    }
+}
+
 function run () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -191,11 +212,8 @@ function run () {
             const repoOwner = 'jadelyyy';
 
             var octokit = new github.GitHub(userToken);
-            
-            const {data: issues} = yield octokit.issues.listForRepo({
-                owner: repoOwner,
-                repo: repoName,
-            });
+
+            var issues = getAllIssues(octokit, repoOwner, repoName, [], 1);
 
             console.log('Total Number of Issues: ' + issues.length);
 
