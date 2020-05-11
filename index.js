@@ -117,15 +117,15 @@ function isWithinMonth(creationDate, baseDate) {
         var prevMonth = false; 
         //  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
         if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear()) {
-            console.log("Month is same and year is same");
+            // console.log("Month is same and year is same");
             withinMonth = true;
         }
         else if (creationDate.getYear() != baseDate.getYear()) {
-            console.log("Creation year is 1 less than base year and base month is january and creation month is december")
+            // console.log("Creation year is 1 less than base year and base month is january and creation month is december")
             prevMonth = (creationDate.getYear() == baseDate.getYear()-1) && baseDate.getMonth() == 0 && creationDate.getMonth() == 11; 
             
         } else { // year is the same, month is diff 
-            console.log("Creation month is 1 month or less than base month");
+            // console.log("Creation month is 1 month or less than base month");
             prevMonth = (baseDate.getMonth() - creationDate.getMonth()) <= 1; // check if created_at is less than 1 month from current moment 
         }
         var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - baseDate.getDate()) + 1, 1);
@@ -136,6 +136,7 @@ function isWithinMonth(creationDate, baseDate) {
         // console.log("within month:", withinMonth, " , creation date:", creationDate, ", base date: ", baseDate, ", prev month: ", prevMonth, " , date min:", dateMinimum);
         // console.log("creation month: ", creationDate.getMonth(), ", month map value:", month_map[creationDate.getMonth()], ", base day:", baseDate.getDate());
         
+        console.log('testing: ' + creationDate);
         console.log('withinMonth: ' + withinMonth);
         return withinMonth;
 
