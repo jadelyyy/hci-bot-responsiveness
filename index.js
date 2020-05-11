@@ -59,7 +59,7 @@ function getAverageTime(times) {
     }
     var averageTimeInMinutes = sum/times.length;
     var hours = Math.floor(averageTimeInMinutes/60);
-    var minutes = averageTimeInMinutes % 60;
+    var minutes = Math.floor(averageTimeInMinutes % 60);
     // if (minutes > 30) {
     //     return hours + 1;
     // } else {
@@ -81,24 +81,28 @@ function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
             // var difference = currTime - prevTime;
-            var difference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + currTime[1]);
-            var percentDifference = Math.floor(Math.abs(difference)/(prevTime[0] * 60 + prevTime[1]) * 100)
+            var difference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
+            var percentDifference = (Math.floor(Math.abs(difference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
+
+            console.log('difference: ' + difference);
+            console.log('percentDifference: ' + percentDifference);
 
             var change, initMessage;
             // response time decreased
             if(difference > 0) {
-                var change = 'increased';
-                var initMessage = '';
+                change = 'increased';
+                initMessage = '';
             }
             if(difference == 0){
-                var change = 'increased';
-                var initMessage = 'Not bad! ';
+                change = 'been maintained the same';
+                initMessage = 'Not bad! ';
+                percentDifference = '';
             }
             else {
-                var initMessage = 'Great job! '
-                var change = 'decreased';
+                change = 'decreased';
+                initMessage = 'Great job! '
             }
-            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month. ` + 
+            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
                             `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
         }
         // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
