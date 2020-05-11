@@ -118,7 +118,7 @@ function isWithinMonth(creationDate, baseDate) {
         //  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
         if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear() &&
             baseDate.getDate() >= creationDate.getDate()) {
-            // console.log("Month is same and year is same");
+            console.log("Month is same and year is same");
             withinMonth = true;
         }
         else if (creationDate.getYear() != baseDate.getYear()) {
@@ -127,18 +127,20 @@ function isWithinMonth(creationDate, baseDate) {
             
         } else { // year is the same, month is diff 
             // console.log("Creation month is 1 month or less than base month");
-            prevMonth = (baseDate.getMonth() - creationDate.getMonth()) <= 1; // check if created_at is less than 1 month from current moment 
+            var monthDiff = baseDate.getMonth() - creationDate.getMonth();
+            prevMonth =  monthDiff <= 1 && monthDiff >= 0; // check if created_at is less than 1 month from current moment 
         }
         var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - baseDate.getDate()) + 1, 1);
         if (!withinMonth) {
+            console.log('creation month is within 1 month');
             withinMonth = prevMonth && creationDate.getDate() >= dateMinimum;
         }
         
         // console.log("within month:", withinMonth, " , creation date:", creationDate, ", base date: ", baseDate, ", prev month: ", prevMonth, " , date min:", dateMinimum);
         // console.log("creation month: ", creationDate.getMonth(), ", month map value:", month_map[creationDate.getMonth()], ", base day:", baseDate.getDate());
         
-        console.log('testing: ' + creationDate);
-        console.log('withinMonth: ' + withinMonth);
+        // console.log('testing: ' + creationDate);
+        // console.log('withinMonth: ' + withinMonth);
         return withinMonth;
 
     } catch (err){
@@ -162,10 +164,11 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
                     console.log('NOT WITHIN MONTH: ' + issueCreationDate);
                     continue;
                 }
+                console.log('WITHIN MONTH: ' + issueCreationDate);
                 firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
                 // console.log('firstResponseDate: ' + firstResponseDate);
                 if(firstResponseDate) {
-                    console.log('First Response Exists: ' + firstResponseDate);
+                    console.log('WITHIN MONTH AND First Response Exists: ' + firstResponseDate);
                     firstResponseTimes.push(getDifference(issueCreationDate, firstResponseDate));
                 }
             }
