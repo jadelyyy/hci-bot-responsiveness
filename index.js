@@ -99,8 +99,8 @@ function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
             var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
                             `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
         }
-        issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
-                    `your repository's response time was better than 70% of the communities on Github!`;
+        // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
+        //             `your repository's response time was better than 70% of the communities on Github!`;
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
