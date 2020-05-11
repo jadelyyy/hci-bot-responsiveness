@@ -198,7 +198,7 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
         }
         if(issuesLeft) {
             console.log('pussing issues....');
-            allIssues.concat(issues);
+            allIssues.push(...issues);
             console.log('allIssues.length: ' + allIssues.length);
             return yield getAllIssues(octokit, repoOwner, repoName, allIssues, pageNum + 1);
         } else {
