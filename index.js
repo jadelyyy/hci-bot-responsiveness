@@ -116,7 +116,8 @@ function isWithinMonth(creationDate, baseDate) {
         var withinMonth = false; 
         var prevMonth = false; 
         //  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
-        if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear()) {
+        if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear() &&
+            baseDate.getDate() >= creationDate.getDate()) {
             // console.log("Month is same and year is same");
             withinMonth = true;
         }
