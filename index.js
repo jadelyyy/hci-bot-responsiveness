@@ -71,7 +71,7 @@ function getAverageTime(times) {
 function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
-        prevTime[5, 50];
+        prevTime = [5, 50];
         console.log('currTime: ' + currTime);
         console.log('prevTime: ' + prevTime);
         if (currTime == null) {
