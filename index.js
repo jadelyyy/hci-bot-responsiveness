@@ -93,12 +93,12 @@ function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
                 change = 'increased';
                 initMessage = '';
             }
-            if(difference == 0){
+            if(difference == 0) {
                 change = 'been maintained the same';
                 initMessage = 'Not bad! ';
                 percentDifference = '';
             }
-            else {
+            if(difference < 0) {
                 change = 'decreased';
                 initMessage = 'Great job! '
             }
