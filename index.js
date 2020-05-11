@@ -70,32 +70,32 @@ function getAverageTimeInHours(times) {
 function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
-        // if (currTime == null) {
-        //     issueBody = `There were no issues created this month.`;
-        // } else if (prevTime == null) {
-        //     issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
-        //                 `your repository's response time was better than 70% of the communities on Github!`;
-        // } else {
-        //     var difference = currTime - prevTime;
-        //     var percentDifference = Math.floor(Math.abs(difference)/prevTime * 100)
+        if (currTime == null) {
+            issueBody = `There were no issues created this month.`;
+        } else if (prevTime == null) {
+            issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
+                        `your repository's response time was better than 70% of the communities on Github!`;
+        } else {
+            var difference = currTime - prevTime;
+            var percentDifference = Math.floor(Math.abs(difference)/prevTime * 100)
 
-        //     var change, initMessage;
-        //     // response time decreased
-        //     if(difference > 0) {
-        //         var change = 'increased';
-        //         var initMessage = '';
-        //     }
-        //     if(difference == 0){
-        //         var change = 'increased';
-        //         var initMessage = 'Not bad! ';
-        //     }
-        //     else {
-        //         var initMessage = 'Great job! '
-        //         var change = 'decreased';
-        //     }
-        //     var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
-        //                     `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
-        // }
+            var change, initMessage;
+            // response time decreased
+            if(difference > 0) {
+                var change = 'increased';
+                var initMessage = '';
+            }
+            if(difference == 0){
+                var change = 'increased';
+                var initMessage = 'Not bad! ';
+            }
+            else {
+                var initMessage = 'Great job! '
+                var change = 'decreased';
+            }
+            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference}% since last month.` + 
+                            `At an average of ${currTime} hours, your response time was better than 70% of the communities on Github!`;
+        }
         issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
                     `your repository's response time was better than 70% of the communities on Github!`;
         const {data: issue} = yield octokit.issues.create({
@@ -117,12 +117,15 @@ function isWithinMonth(creationDate, baseDate) {
         var prevMonth = false; 
         //  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
         if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear()) {
+            console.log("Month is same and year is same");
             withinMonth = true;
         }
         else if (creationDate.getYear() != baseDate.getYear()) {
+            console.log("Creation year is 1 less than base year and base month is january and creation month is december")
             prevMonth = (creationDate.getYear() == baseDate.getYear()-1) && baseDate.getMonth() == 0 && creationDate.getMonth() == 11; 
             
         } else { // year is the same, month is diff 
+            console.log("Creation month is 1 month or less than base month");
             prevMonth = (baseDate.getMonth() - creationDate.getMonth()) <= 1; // check if created_at is less than 1 month from current moment 
         }
         var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - baseDate.getDate()) + 1, 1);
@@ -151,19 +154,19 @@ function getResponseTimes(octokit, repoOwner, repoName, issues, baseDate) {
                 issue = issues[i];
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
-                console.log('\ncurrent issueID: ' + issueNumber);
-                console.log('issue created at: ' + issueCreationDate);
+                // console.log('\ncurrent issueID: ' + issueNumber);
+                // console.log('issue created at: ' + issueCreationDate);
                 if(!isWithinMonth(issueCreationDate, baseDate)) {
+                    console.log('NOT WITHIN MONTH: ' + issueCreationDate);
                     continue;
                 }
                 firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
-                console.log('firstResponseDate: ' + firstResponseDate);
+                // console.log('firstResponseDate: ' + firstResponseDate);
                 if(firstResponseDate) {
-                    console.log('not null..adding..');
+                    console.log('First Response Exists: ' + firstResponseDate);
                     firstResponseTimes.push(getDifference(issueCreationDate, firstResponseDate));
                 }
             }
-            console.log('firstResponseTimes: ' + firstResponseTimes);
             return firstResponseTimes;
         } catch(err) {
             console.log(err);
@@ -185,32 +188,34 @@ function run () {
                 repo: repoName,
             });
 
-            console.log('num issues: ' + issues.length);
+            console.log('Total Number of Issues: ' + issues.length);
 
             var baseDate = new Date();
-            console.log('original baseDate: ' + baseDate);
+            console.log('\noriginal baseDate: ' + baseDate);
             var currMonthResponseTimes = yield getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
             console.log('currMonthResponseTimes Array: ' + currMonthResponseTimes);
-            console.log('number of times: ' + currMonthResponseTimes.length);
+            console.log('number of currMonthResponseTimes: ' + currMonthResponseTimes.length);
         
             var currMonthAveResponseTime = getAverageTimeInHours(currMonthResponseTimes);
             console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
 
             if (baseDate.getMonth() == 1) {
-                var prevMonth = 12;
+                var prevMonth = 11;
             } else {
                 var prevMonth = baseDate.getMonth() - 1;
             }
             var prevDay = Math.max(month_map[prevMonth] - (31 - baseDate.getDate()) + 1, 1);
-            if(prevMonth == 12) {
+            if(prevMonth == 11) {
                 baseDate.setYear(baseDate.getYear() - 1)
             }
             baseDate.setDate(prevDay);
             baseDate.setMonth(prevMonth);
-            console.log('new BaseDate: ' + baseDate);
+            console.log('\nnew BaseDate: ' + baseDate);
 
             var prevMonthResponseTimes = yield getResponseTimes(octokit, repoOwner, repoName, issues, baseDate);
             var prevMonthAveResponseTime = getAverageTimeInHours(prevMonthResponseTimes);
+            console.log('prevMonthResponseTimes Array: ' + currMonthResponseTimes);
+            console.log('number of prevMonthResponseTimes: ' + currMonthResponseTimes.length);
 
             yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime, prevMonthAveResponseTime);
 
