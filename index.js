@@ -60,10 +60,11 @@ function getAverageTime(times) {
     return [hours, minutes]
 }
 
-function createIssue(octokit, repoOwner, repoName, currTime, prevTime) {
+function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
-        prevTime = [5, 47];
+        var currTime = currData.aveResponseTime;
+        var prevTime = [5, 47];
         console.log('currTime: ' + currTime);
         console.log('prevTime: ' + prevTime);
         if (currTime == null) {
@@ -217,6 +218,8 @@ function run () {
             console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
             console.log(`${currMonthIssuesData.unresponded}/${currMonthIssuesData.total} unresponded`);
 
+            currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
+
             if (baseDate.getMonth() == 1) {
                 var prevMonth = 11;
             } else {
@@ -239,8 +242,9 @@ function run () {
             console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
             console.log(`${prevMonthIssuesData.unresponded}/${prevMonthIssuesData.total} unresponded`);
 
+            prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
 
-            yield createIssue(octokit, repoOwner, repoName, currMonthAveResponseTime, prevMonthAveResponseTime);
+            yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData);
 
         } catch(err) {
             console.log(err);
