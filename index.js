@@ -35,6 +35,17 @@ function getAverageTime(times) {
     return [hours, minutes]
 }
 
+function getAverageNumComments(comments) {
+    if(comments.length == 0) {
+        return null;
+    }
+    var sum = 0;
+    for (var i = 0; i < comments.length; i++) {
+        sum += comments[i];
+    }
+    return Math.floor(sum/comments.length);
+}
+
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
@@ -67,7 +78,11 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 initMessage = 'Great job! '
             }
             var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
-                            `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
+                            // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
+                            `This month, your repository's metrics are: ` +
+                            `\n\tAverage response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
+                            `\n\tNumber of unresponded issues: ${currData.unresponded}/${currData.total}` + 
+                            `\n\tAverage number of comments per issue: ${currData.aveNumComments}`;
         }
         // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
         //             `your repository's response time was better than 70% of the communities on Github!`;
@@ -227,6 +242,7 @@ function run () {
             console.log('numComments: ' + currMonthIssuesData.numComments);
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
+            currMonthIssuesData.aveNumComments = getAverageNumComments(currMonthIssuesData.numComments);
 
             if (baseDate.getMonth() == 1) {
                 var prevMonth = 11;
@@ -249,8 +265,10 @@ function run () {
             console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
             console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
             console.log(`${prevMonthIssuesData.unresponded}/${prevMonthIssuesData.total} unresponded`);
+            console.log('numComments: ' + prevMonthIssuesData.numComments);
 
             prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
+            prevMonthIssuesData.aveNumComments = getAverageNumComments(prevMonthIssuesData.numComments);
 
             yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData);
 
