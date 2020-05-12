@@ -13,31 +13,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
-function getFirstResponseDate(octokit, repoOwner, repoName, issueNumber) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const {data: comments} = yield octokit.issues.listComments({
-            owner: repoOwner,
-            repo: repoName,
-            issue_number: issueNumber
-        });
-
-        // return immediately if issue has no comments
-        if(comments.length == 0) {
-            return null;
-        } else {
-            var commentCreationDate;
-            var earliestCreationDate = new Date(comments[0].created_at);
-            for (var i = 0; i < comments.length; i++) {
-                commentCreationDate = new Date(comments[i].created_at);
-                if(commentCreationDate.getTime() < earliestCreationDate.getTime()) {
-                    earliestCreationDate = commentCreationDate;
-                }
-            }
-            return earliestCreationDate;
-        }
-    });
-}
-
 // assume timeB later than timeA
 function getDifference(dateA, dateB) {
     var difference = dateB - dateA;
@@ -64,7 +39,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
         var currTime = currData.aveResponseTime;
-        var prevTime = [5, 47];
+        var prevTime = [5, 47]; 
         console.log('currTime: ' + currTime);
         console.log('prevTime: ' + prevTime);
         if (currTime == null) {
@@ -139,11 +114,41 @@ function isWithinMonth(creationDate, baseDate) {
     }
 }
 
+function getCommentsData(octokit, repoOwner, repoName, issueNumber) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const {data: comments} = yield octokit.issues.listComments({
+            owner: repoOwner,
+            repo: repoName,
+            issue_number: issueNumber
+        });
+
+        // return immediately if issue has no comments
+        if(comments.length == 0) {
+            return null;
+        } else {
+            var commentCreationDate;
+            var earliestCreationDate = new Date(comments[0].created_at);
+            for (var i = 0; i < comments.length; i++) {
+                commentCreationDate = new Date(comments[i].created_at);
+                if(commentCreationDate.getTime() < earliestCreationDate.getTime()) {
+                    earliestCreationDate = commentCreationDate;
+                }
+            }
+            // return earliestCreationDate;
+            return {
+                firstResponseDate: earliestCreationDate,
+                totalComments: comments.length
+            }
+        }
+    });
+}
+
 function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             var firstResponseTimes = [];
-            var firstResponseDate;
+            var numComments = []
+            var commentsData;
             var issue, issueNumber, issueCreationDate;
             var total = 0;
             var unresponded = 0;
@@ -155,9 +160,10 @@ function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
                     continue;
                 }
                 total += 1;
-                firstResponseDate = yield getFirstResponseDate(octokit, repoOwner, repoName, issueNumber);
-                if(firstResponseDate) {
-                    firstResponseTimes.push(getDifference(issueCreationDate, firstResponseDate));
+                commentsData = yield getCommentsData(octokit, repoOwner, repoName, issueNumber);
+                if(commentsData) {
+                    firstResponseTimes.push(getDifference(issueCreationDate, commentsData.firstResponseDate));
+                    numComments.push(commentsData.totalComments);
                 } else {
                     unresponded += 1;
                 }
@@ -166,7 +172,8 @@ function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
             return {
                 firstResponseTimes: firstResponseTimes,
                 total: total,
-                unresponded: unresponded
+                unresponded: unresponded,
+                numComments: numComments
             }
         } catch(err) {
             console.log(err);
@@ -217,6 +224,7 @@ function run () {
             console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
             console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
             console.log(`${currMonthIssuesData.unresponded}/${currMonthIssuesData.total} unresponded`);
+            console.log('numComments: ' + currMonthIssuesData.numComments);
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
 
