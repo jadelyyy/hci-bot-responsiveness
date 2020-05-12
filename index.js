@@ -80,9 +80,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: ` +
-                            `\n\tAverage response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
-                            `\n\tNumber of unresponded issues: ${currData.unresponded}/${currData.total}` + 
-                            `\n\tAverage number of comments per issue: ${currData.aveNumComments}`;
+                            `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
+                            `\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}` + 
+                            `\n    Average number of comments per issue: ${currData.aveNumComments}`;
         }
         // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
         //             `your repository's response time was better than 70% of the communities on Github!`;
