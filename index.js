@@ -48,16 +48,16 @@ function getAverageNumComments(comments) {
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
+        var badgeImage = '<img src="https://img.shields.io/badge/responsetime-1hr-green"></img>';
         var issueBody;
         var currTime = currData.aveResponseTime;
         var prevTime = [5, 47]; 
         console.log('currTime: ' + currTime);
         console.log('prevTime: ' + prevTime);
         if (currTime == null) {
-            issueBody = `There were no issues created this month.`;
+            issueBody = `${badgeImage}\nThere were no issues created this month.`;
         } else if (prevTime == null) {
-            <img src="https://img.shields.io/badge/responsetime-1hr-green"></img>
-            issueBody = `Great job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
+            issueBody = `${badgeImage}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
             // var difference = currTime - prevTime;
@@ -78,7 +78,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 change = 'decreased';
                 initMessage = 'Great job! '
             }
-            var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
+            var issueBody = `${badgeImage}\n${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
