@@ -56,6 +56,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
+            <img src="https://img.shields.io/badge/responsetime-1hr-green"></img>
             issueBody = `Great job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
@@ -79,7 +80,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             }
             var issueBody = `${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
-                            `This month, your repository's metrics are: ` +
+                            `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
                             `\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}` + 
                             `\n    Average number of comments per issue: ${currData.aveNumComments}`;
