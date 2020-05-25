@@ -145,8 +145,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 overallChangeString = 'did not improve';
                 initMessage = 'Great job!';
             }
-    
-            var issueBody = `${responseTimeBadge}\n${numUnrespondedBadge}${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
+            
+            var badgeImage = `https://img.shields.io/badge/hello-name-green`;
+            var issueBody = `${badgeImage}\n${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
