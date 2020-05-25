@@ -103,32 +103,32 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
             // response time decreased
             if(timeDifference > 0) {
-                change.push(-1);
+                changes.push(-1);
                 responseTimeBadge = createBadge('response time', 'slower');
             }
             // response stayed the same
             if(timeDifference == 0) {
-                change.push(0);
+                changes.push(0);
                 responseTimeBadge = createBadge('response time', 'same');
             }
             // response time increased
             if(timeDifference < 0) {
-                change.push(1);
+                changes.push(1);
                 responseTimeBadge = createBadge('response time', 'faster');
             }
             // more responded previous month
             if(unrespondedDifference > 0) {
-                change.push(-1)
+                changes.push(-1)
                 numUnrespondedBadge = createBadge('num unanswered ', 'increased');
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
-                change.push(0)
+                changes.push(0)
                 numUnrespondedBadge = createBadge('num unanswered ', 'same');
             }
             // more responded this month
             if(unrespondedDifference < 0) {
-                change.push(1)
+                changes.push(1)
                 numUnrespondedBadge = createBadge('num unanswered ', 'decreased');
             }
 
