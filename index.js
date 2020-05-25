@@ -104,37 +104,37 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             // response time decreased
             if(timeDifference > 0) {
                 changes.push(-1);
-                responseTimeBadge = createBadge('response time', 'slower');
+                responseTimeBadge = createBadge('response_time', 'slower');
             }
             // response stayed the same
             if(timeDifference == 0) {
                 changes.push(0);
-                responseTimeBadge = createBadge('response time', 'same');
+                responseTimeBadge = createBadge('response_time', 'same');
             }
             // response time increased
             if(timeDifference < 0) {
                 changes.push(1);
-                responseTimeBadge = createBadge('response time', 'faster');
+                responseTimeBadge = createBadge('response_time', 'faster');
             }
             // more responded previous month
             if(unrespondedDifference > 0) {
                 changes.push(-1)
-                numUnrespondedBadge = createBadge('num unanswered ', 'increased');
+                numUnrespondedBadge = createBadge('num_unanswered ', 'increased');
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
                 changes.push(0)
-                numUnrespondedBadge = createBadge('num unanswered ', 'same');
+                numUnrespondedBadge = createBadge('num_unanswered ', 'same');
             }
             // more responded this month
             if(unrespondedDifference < 0) {
                 changes.push(1)
-                numUnrespondedBadge = createBadge('num unanswered ', 'decreased');
+                numUnrespondedBadge = createBadge('num_unanswered ', 'decreased');
             }
 
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
-                overallChangeString = 'improved';
+                overallChangeString = 'has improved';
                 initMessage = '';
             }
             if(overallChange > 0) {
@@ -146,7 +146,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 initMessage = 'Great job!';
             }
     
-            var issueBody = `${responseTimeBadge}\n${numUnrespondedBadge}${initMessage} This month, your repository's overall responsivness has ${overallChangeString} since last month. ` + 
+            var issueBody = `${responseTimeBadge}\n${numUnrespondedBadge}${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
