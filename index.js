@@ -65,7 +65,6 @@ function getOverallChange(changes) {
 function createBadge(label, message) {
     var color = badge_color_map[message];
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
-    // return `https://img.shields.io/badge/${label}-${message}-${color}`;
 }
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
@@ -87,7 +86,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
-            responseTimeBadge = createBadge('response time', 'no_issues');
+            responseTimeBadge = createBadge('response%20time', 'no_issues');
             numUnrespondedBadge = createBadge('unresponded', 'no_issues');
             aveNumCommentsBadge = createBadge('comments', 'no_issues');
             issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
@@ -105,38 +104,38 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             // response time decreased
             if(timeDifference > 0) {
                 changes.push(-1);
-                responseTimeBadge = createBadge('response_time', 'slower');
+                responseTimeBadge = createBadge('response%20time', 'slower');
             }
             // response stayed the same
             if(timeDifference == 0) {
                 changes.push(0);
-                responseTimeBadge = createBadge('response_time', 'same');
+                responseTimeBadge = createBadge('response%20time', 'same');
             }
             // response time increased
             if(timeDifference < 0) {
                 changes.push(1);
-                responseTimeBadge = createBadge('response_time', 'faster');
+                responseTimeBadge = createBadge('response%20time', 'faster');
             }
             // more responded previous month
             if(unrespondedDifference > 0) {
                 changes.push(-1)
-                numUnrespondedBadge = createBadge('num_unanswered ', 'increased');
+                numUnrespondedBadge = createBadge('num%20unanswered ', 'increased');
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
                 changes.push(0)
-                numUnrespondedBadge = createBadge('num_unanswered ', 'same');
+                numUnrespondedBadge = createBadge('num%20unanswered ', 'same');
             }
             // more responded this month
             if(unrespondedDifference < 0) {
                 changes.push(1)
-                numUnrespondedBadge = createBadge('num_unanswered ', 'decreased');
+                numUnrespondedBadge = createBadge('num%20unanswered ', 'decreased');
             }
 
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
-                initMessage = '';
+                initMessage = 'Great job!';
             }
             if(overallChange > 0) {
                 overallChangeString = 'stayed the same';
@@ -144,10 +143,10 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             }
             if(overallChange > 0) {
                 overallChangeString = 'did not improve';
-                initMessage = 'Great job!';
+                initMessage = '';
             }
     
-            var issueBody = `${responseTimeBadge}\n${numUnrespondedBadge}${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
+            var issueBody = `${responseTimeBadge}${numUnrespondedBadge}\n${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
