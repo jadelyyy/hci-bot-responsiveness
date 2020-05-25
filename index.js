@@ -64,7 +64,7 @@ function getOverallChange(changes) {
 }
 function createBadge(label, message) {
     var color = badge_color_map[message];
-    return `https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}`;
+    return `https://img.shields.io/badge/${label}-${message}-${color}`;
 }
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
