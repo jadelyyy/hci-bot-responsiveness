@@ -64,7 +64,8 @@ function getOverallChange(changes) {
 }
 function createBadge(label, message) {
     var color = badge_color_map[message];
-    return `https://img.shields.io/badge/${label}-${message}-${color}`;
+    return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
+    // return `https://img.shields.io/badge/${label}-${message}-${color}`;
 }
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
@@ -145,9 +146,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 overallChangeString = 'did not improve';
                 initMessage = 'Great job!';
             }
-            
-            var badgeImage = `https://img.shields.io/badge/hello-name-green`;
-            var issueBody = `${badgeImage}\n${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
+    
+            var issueBody = `${responseTimeBadge}\n${numUnrespondedBadge}${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
