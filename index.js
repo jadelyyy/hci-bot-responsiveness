@@ -89,7 +89,10 @@ function createBadge(badgeName, message) {
     if(message == 'same') {
         color = 'yellow';
     } else {
+        console.log('badgeName: ' + badgeName);
         color = badge_color_map[badgeName][message];
+        var color_map = badge_color_map.badgeName;
+        color = color_map[message];
         label = badge_name_map;
     }
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
