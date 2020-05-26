@@ -5,12 +5,30 @@ const github = require("@actions/github");
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
 
 var badge_color_map = {
-    'decreased': 'brightgreen',
-    'same': 'green',
-    'increased': 'yellowgreen',
-    'no_issues': 'grey',
+    'response_time': response_map,
+    'unresponded': unresponded_map,
+    'ave_comments': ave_comments_map
+};
+
+var badge_name_map = {
+    'response_time': 'response%20time',
+    'unresponded': 'num%20unanswered',
+    'ave_comments': 'num%20comments'
+}
+
+var response_map = {
     'faster': 'brightgreen',
-    'slower': 'yellowgreen',
+    'slower': 'orange',
+};
+
+var unresponded_map = {
+    'decreased': 'brightgreen',
+    'increased': 'orange'
+};
+
+var ave_comments_map = {
+    'increased': 'brightgreen',
+    'decreased': 'orange'
 };
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -62,8 +80,18 @@ function getOverallChange(changes) {
     }
     return change;
 }
-function createBadge(label, message) {
-    var color = badge_color_map[message];
+
+function createBadge(badgeName, message) {
+    var color;
+    if(message == 'no issues') {
+        color = 'grey';
+    }
+    if(message == 'same') {
+        color = 'yellow';
+    } else {
+        color = badge_color_map[badgeName][message];
+        label = badge_name_map;
+    }
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
 }
 
@@ -86,9 +114,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
-            responseTimeBadge = createBadge('response%20time', 'no_issues');
-            numUnrespondedBadge = createBadge('unresponded', 'no_issues');
-            aveNumCommentsBadge = createBadge('comments', 'no_issues');
+            responseTimeBadge = createBadge('response_time', 'no issues');
+            numUnrespondedBadge = createBadge('unresponded', 'no issues');
+            aveNumCommentsBadge = createBadge('ave_comments', 'no issues');
             issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
@@ -104,32 +132,47 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             // response time decreased
             if(timeDifference > 0) {
                 changes.push(-1);
-                responseTimeBadge = createBadge('response%20time', 'slower');
+                responseTimeBadge = createBadge('response_time', 'slower');
             }
             // response stayed the same
             if(timeDifference == 0) {
                 changes.push(0);
-                responseTimeBadge = createBadge('response%20time', 'same');
+                responseTimeBadge = createBadge('response_time', 'same');
             }
             // response time increased
             if(timeDifference < 0) {
                 changes.push(1);
-                responseTimeBadge = createBadge('response%20time', 'faster');
+                responseTimeBadge = createBadge('response_time', 'faster');
             }
             // more responded previous month
             if(unrespondedDifference > 0) {
                 changes.push(-1)
-                numUnrespondedBadge = createBadge('num%20unanswered ', 'increased');
+                numUnrespondedBadge = createBadge('unresponded', 'increased');
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
                 changes.push(0)
-                numUnrespondedBadge = createBadge('num%20unanswered ', 'same');
+                numUnrespondedBadge = createBadge('unresponded', 'same');
             }
             // more responded this month
             if(unrespondedDifference < 0) {
                 changes.push(1)
-                numUnrespondedBadge = createBadge('num%20unanswered ', 'decreased');
+                numUnrespondedBadge = createBadge('unresponded', 'decreased');
+            }
+            // more comments this month
+            if(numCommentsDifference > 0) {
+                changes.push(1);
+                aveNumCommentsBadge = createBadge('ave_comments', 'increased');
+            }
+            // same comments
+            if(numCommentsDifference > 0) {
+                changes.push(0);
+                aveNumCommentsBadge = createBadge('ave_comments', 'same');
+            }
+            // less comments this month
+            if(numCommentsDifference < 0) {
+                changes.push(-1);
+                aveNumCommentsBadge = createBadge('ave_comments', 'decreased');
             }
 
             overallChange = getOverallChange(changes);
@@ -148,7 +191,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
-            var issueBody = `${numUnrespondedBadge}\n${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
+            console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
+            var issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
+                            `${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
