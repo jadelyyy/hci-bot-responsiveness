@@ -200,7 +200,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                            `<p align="center">${responseTimeBadge} ${numUnrespondedBadge} ${aveNumCommentsBadge}\n</p>` + 
+                            `<p align="center">${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
@@ -395,6 +395,27 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
     });
 }
 
+function getAllPulls(octokit, repoOwner, repoName, issues, allPulls, pageNum=1) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const {data: pulls} = yield octokit.pulls.list({
+            owner: repoOwner,
+            repo: repoName,
+            per_page: 100,
+            page: pageNum
+        });
+        var pullsLeft = true;
+        if(pulls.length == 0) {
+            pullsLeft = false;
+        }
+        if(pullsLeft) {
+            allPulls.push(...pulls);
+            return yield getAllPulls(octokit, repoOwner, repoName, issues, allPulls, pageNum + 1);
+        } else {
+            return allPulls;
+        }
+    });
+}
+
 function run () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -406,18 +427,14 @@ function run () {
 
             var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
+            var pulls = yield getAllPulls(octokit, repoOwner, repoName, issues, [], 1);
+
             console.log('Total Number of Issues: ' + issues.length);
 
             var baseDate = new Date();
-            console.log('\noriginal baseDate: ' + baseDate);
-            // var currMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+
             var currMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
             var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
-            console.log('currMonthResponseTimes Array: ' + currMonthIssuesData.firstResponseTimes);
-            console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
-            console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
-            console.log(`${currMonthIssuesData.unresponded}/${currMonthIssuesData.total} unresponded`);
-            console.log('numComments: ' + currMonthIssuesData.numComments);
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
             currMonthIssuesData.aveNumComments = getAverageNumComments(currMonthIssuesData.numComments);
@@ -434,16 +451,9 @@ function run () {
 
             baseDate.setDate(prevDay);
             baseDate.setMonth(prevMonth);
-            console.log('\nnew BaseDate: ' + baseDate);
 
-            // var prevMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
             var prevMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
-            console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
-            console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
-            console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
-            console.log(`${prevMonthIssuesData.unresponded}/${prevMonthIssuesData.total} unresponded`);
-            console.log('numComments: ' + prevMonthIssuesData.numComments);
 
             prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
             prevMonthIssuesData.aveNumComments = getAverageNumComments(prevMonthIssuesData.numComments);
