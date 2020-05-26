@@ -108,8 +108,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             firstResponseTimes: [0],
             total: 40,
             unresponded: 32,
-            numComments: 2,
-            aveResponseTime: [5, 47]
+            numComments: [2, 2],
+            aveResponseTime: [5, 47],
+            aveNumComments: 2
         }
         var prevTime = prevData.aveResponseTime;
 
@@ -129,7 +130,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
             var percentTimeDifference = (Math.floor(Math.abs(timeDifference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total)) - (Math.floor(prevData.unresponded/prevData.total));
-            var numCommentsDifference = currData.numComments - prevData.numComments;
+            var numCommentsDifference = currData.aveNumComments - prevData.aveNumComments;
             var overallChange, initMessage;
             var overallChangeString;
 
@@ -374,7 +375,6 @@ function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
                     unresponded += 1;
                 }
             }
-            // return firstResponseTimes;
             return {
                 firstResponseTimes: firstResponseTimes,
                 total: total,
