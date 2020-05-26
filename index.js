@@ -182,17 +182,17 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
                 initMessage = 'Great job!';
-                overallBadge = createBadge('overall', 'improved', 'for-the-badge');
+                overallBadge = createBadge('overall', 'improved');
             }
             if(overallChange == 0) {
                 overallChangeString = 'stayed the same';
                 initMessage = 'Not bad!';
-                overallBadge = createBadge('overall', 'same', 'for-the-badge');
+                overallBadge = createBadge('overall', 'same');
             }
             if(overallChange < 0) {
                 overallChangeString = 'has not improved';
                 initMessage = '';
-                overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
+                overallBadge = createBadge('overall', 'did not improve');
             }
             
             console.log('overallBadge: ' + overallBadge);
