@@ -91,7 +91,6 @@ function createBadge(badgeName, message) {
     if(message == 'same') {
         color = 'yellow';
     } else {
-        console.log('badgeName: ' + badgeName);
         var color_map = badge_color_map[badgeName];
         color = color_map[message];
         label = badge_name_map[badgeName];
@@ -140,47 +139,55 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
             // response time decreased
             if(timeDifference > 0) {
+                console.log('\n1\n');
                 changes.push(-1);
                 responseTimeBadge = createBadge('response_time', 'slower');
             }
             // response stayed the same
             if(timeDifference == 0) {
+                console.log('\n2\n');
                 changes.push(0);
                 responseTimeBadge = createBadge('response_time', 'same');
             }
             // response time increased
             if(timeDifference < 0) {
+                console.log('\n3\n');
                 changes.push(1);
                 responseTimeBadge = createBadge('response_time', 'faster');
             }
             // more responded previous month
             if(unrespondedDifference > 0) {
+                console.log('\n4\n');
                 changes.push(-1)
                 numUnrespondedBadge = createBadge('unresponded', 'increased');
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
+                console.log('\n5\n');
                 changes.push(0)
-                console.log('calling create badge function with badgeName=unresponde and message=same');
                 numUnrespondedBadge = createBadge('unresponded', 'same');
             }
             // more responded this month
             if(unrespondedDifference < 0) {
+                console.log('\n6\n');
                 changes.push(1)
                 numUnrespondedBadge = createBadge('unresponded', 'decreased');
             }
             // more comments this month
             if(numCommentsDifference > 0) {
+                console.log('\n7\n');
                 changes.push(1);
                 aveNumCommentsBadge = createBadge('ave_comments', 'increased');
             }
             // same comments
             if(numCommentsDifference == 0) {
+                console.log('\n8\n');
                 changes.push(0);
                 aveNumCommentsBadge = createBadge('ave_comments', 'same');
             }
             // less comments this month
             if(numCommentsDifference < 0) {
+                console.log('\n9\n');
                 changes.push(-1);
                 aveNumCommentsBadge = createBadge('ave_comments', 'decreased');
             }
