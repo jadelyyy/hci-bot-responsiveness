@@ -84,21 +84,18 @@ function getOverallChange(changes) {
 
 function createBadge(badgeName, message) {
     var color;
-    var label;
     console.log('badgeName: ' + badgeName);
     console.log('message: ' + message);
     if(message == 'no issues') {
         color = 'grey';
-        label = badgeName;
     }
     if(message == 'same') {
         color = 'yellow';
-        label = badgeName;
     } else {
-        var color_map = badge_color_map[badgeName];
-        color = color_map[message];
-        label = badge_name_map[badgeName];
+        color = badge_color_map[badgeName][message];
     }
+    var label = badge_name_map[badgeName];
+
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
 }
 
@@ -216,7 +213,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
-                            `${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
+                            `${initMessage} This month, your repository's overall responsiveness to issues ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
