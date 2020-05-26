@@ -102,11 +102,14 @@ function createBadge(badgeName, message, style='flat') {
         color = badge_color_map[badgeName][message];
     }
     var label = badge_name_map[badgeName];
-    if(style == 'flat') {
-        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
+    if(style == 'flat') {        
+        return `<p align="center">` + 
+                `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}">` + 
+                `</p>`;;
     } else {
-        return `<img align="center" ` + 
-                `src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}&style=${style}"> </img>`;
+        return `<p align="center">` + 
+                `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}&style=${style}">` + 
+                `</p>`;
     }
 }
 
