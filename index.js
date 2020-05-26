@@ -92,11 +92,7 @@ function createBadgeWithData(badgeName, status, data) {
         color = badge_color_map[badgeName][status];
     }
     var label = badge_name_map[badgeName];
-    if(style == 'flat') {        
-        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}">`;
-    } else {
-        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}&style=${style}">`
-    }
+    return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}">`;
 }
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
