@@ -2,9 +2,11 @@ const { Octokit } = require("@octokit/rest");
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const badgeFile = require('./badgeData.js');
-const badge_color_map = badgeFile.badge_color_map;
-const badge_name_map = badgeFile.badge_name_map;
+const {badge_color_map, badge_name_map} = require("./badgeData.js");
+console.log('IMPORTED....\n');
+console.log('badge_color_map: ' + badge_color_map);
+console.log('badge_name_map: ' + badge_name_map);
+
 
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
 

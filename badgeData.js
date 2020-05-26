@@ -32,5 +32,7 @@ var badge_name_map = {
     'overall': 'responsiveness'
 }
 
-module.exports.badge_color_map = 'badge_color_map';
-module.exports.badge_name_map = 'badge_name_map';
+module.exports = {
+    badge_color_map: badge_color_map,
+    badge_name_map: badge_name_map
+}
