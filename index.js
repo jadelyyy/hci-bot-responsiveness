@@ -226,7 +226,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             if(overallChange < 0) {
                 overallChangeString = 'has not improved';
                 initMessage = '';
-                overallBadge = createBadge('overall', 'did%20not%20improve', 'for-the-badge');
+                overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
             }
             
             console.log('overallBadge: ' + overallBadge);
