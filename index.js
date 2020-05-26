@@ -83,6 +83,8 @@ function getOverallChange(changes) {
 
 function createBadge(badgeName, message) {
     var color;
+    console.log('badgeName: ' + badgeName);
+    console.log('message: ' + message);
     if(message == 'no issues') {
         color = 'grey';
     }
@@ -131,6 +133,11 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var overallChange, initMessage;
             var overallChangeString;
 
+            console.log("\n\n\n\n");
+            console.log('timeDifference: ' + timeDifference);
+            console.log('unrespondedDifference: ' + unrespondedDifference);
+            console.log('numCommentsDifference: ' + numCommentsDifference);
+
             // response time decreased
             if(timeDifference > 0) {
                 changes.push(-1);
@@ -154,6 +161,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
                 changes.push(0)
+                console.log('calling create badge function with badgeName=unresponde and message=same');
                 numUnrespondedBadge = createBadge('unresponded', 'same');
             }
             // more responded this month
