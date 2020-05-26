@@ -26,9 +26,9 @@ var badge_color_map = {
 };
 
 var badge_name_map = {
-    response_time: 'response%20time',
-    unresponded: 'num%20unanswered',
-    ave_comments: 'num%20comments'
+    'response_time': 'response%20time',
+    'unresponded': 'num%20unanswered',
+    'ave_comments': 'num%20comments'
 }
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -91,13 +91,8 @@ function createBadge(badgeName, message) {
     } else {
         console.log('badgeName: ' + badgeName);
         var color_map = badge_color_map[badgeName];
-        console.log('color_map: ' + color_map);
         color = color_map[message];
         label = badge_name_map[badgeName];
-        console.log('label: ' + label);
-        label = badge_name_map.badgeName;
-        console.log('label: ' + label);
-
     }
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
 }
