@@ -2,41 +2,11 @@ const { Octokit } = require("@octokit/rest");
 const core = require("@actions/core");
 const github = require("@actions/github");
 
+const badgeFile = require('./badgeData.js');
+const badge_color_map = badgeFile.badge_color_map;
+const badge_name_map = badgeFile.badge_name_map;
+
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
-
-var response_map = {
-    'faster': 'brightgreen',
-    'slower': 'orange',
-};
-
-var unresponded_map = {
-    'decreased': 'brightgreen',
-    'increased': 'orange'
-};
-
-var ave_comments_map = {
-    'increased': 'brightgreen',
-    'decreased': 'orange'
-};
-
-var overall_map = {
-    'improved': 'brightgreen',
-    'did not improve': 'orange'
-}
-
-var badge_color_map = {
-    'response_time': response_map,
-    'unresponded': unresponded_map,
-    'ave_comments': ave_comments_map,
-    'overall': overall_map
-};
-
-var badge_name_map = {
-    'response_time': 'response%20time',
-    'unresponded': 'num%20unresponded',
-    'ave_comments': 'num%20comments',
-    'overall': 'responsiveness'
-}
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -229,18 +199,15 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
-            var issueBody = `<p align="center">${overallBadge}\n></p>` + 
+            var issueBody = `<p align="center">${overallBadge}\n</p>` + 
                             `<p align="center">${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
-                            // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                             `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
                             `<h3>\nUnresponded Issues:</h3>` + 
                             `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
         }
-        // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
-        //             `your repository's response time was better than 70% of the communities on Github!`;
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
