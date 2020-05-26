@@ -19,16 +19,23 @@ var ave_comments_map = {
     'decreased': 'orange'
 };
 
+var overall_map = {
+    'improved': 'brightgreen',
+    'did not improve': 'orange'
+}
+
 var badge_color_map = {
     'response_time': response_map,
     'unresponded': unresponded_map,
-    'ave_comments': ave_comments_map
+    'ave_comments': ave_comments_map,
+    'overall': overall_map
 };
 
 var badge_name_map = {
     'response_time': 'response%20time',
     'unresponded': 'num%20unresponded',
-    'ave_comments': 'num%20comments'
+    'ave_comments': 'num%20comments',
+    'overall': 'responsiveness'
 }
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -82,7 +89,7 @@ function getOverallChange(changes) {
     return change;
 }
 
-function createBadge(badgeName, message) {
+function createBadge(badgeName, message, style='flat') {
     var color;
     console.log('badgeName: ' + badgeName);
     console.log('message: ' + message);
@@ -95,14 +102,18 @@ function createBadge(badgeName, message) {
         color = badge_color_map[badgeName][message];
     }
     var label = badge_name_map[badgeName];
-
-    return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
+    if(style == 'flat') {
+        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
+    } else {
+        return `<img syle="display:block;margin-left:auto;margin-right:auto;" ` + 
+                `src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}&style=${style}"> </img>`;
+    }
 }
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
-        var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge;
+        var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
         var currTime = currData.aveResponseTime;
         prevData = {
             firstResponseTimes: [0],
@@ -122,6 +133,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             responseTimeBadge = createBadge('response_time', 'no issues');
             numUnrespondedBadge = createBadge('unresponded', 'no issues');
             aveNumCommentsBadge = createBadge('ave_comments', 'no issues');
+            overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
             issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
@@ -201,20 +213,23 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
                 initMessage = 'Great job!';
+                overallBadge = createBadge('overall', 'improved', 'for-the-badge');
             }
             if(overallChange == 0) {
                 overallChangeString = 'stayed the same';
                 initMessage = 'Not bad!';
+                overallBadge = createBadge('overall', 'same', 'for-the-badge');
             }
             if(overallChange < 0) {
                 overallChangeString = 'did not improve';
                 initMessage = '';
+                overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
             }
             
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
-            var issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
+            var issueBody = `${overallBadge}\n${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
                             `<h1>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h1>` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `<h3>\nResponded Issues: </h3>` + 
