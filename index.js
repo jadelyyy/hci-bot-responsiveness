@@ -27,7 +27,7 @@ var badge_color_map = {
 
 var badge_name_map = {
     'response_time': 'response%20time',
-    'unresponded': 'num%20unanswered',
+    'unresponded': 'num%20unresponded',
     'ave_comments': 'num%20comments'
 }
 
@@ -213,12 +213,14 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
-                            `${initMessage} This month, your repository's overall responsiveness to issues ${overallChangeString} since last month. ` + 
+                            `<h1>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h1>` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
-                            `This month, your repository's metrics are: \n` +
-                            `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
-                            `\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}` + 
-                            `\n    Average number of comments per issue: ${currData.aveNumComments}`;
+                            `<h2>\nThis month, your repository's metrics are:</h2>` +
+                            `<h3>\nResponded Issues: </h3>` + 
+                            `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
+                            `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
+                            `<h3>\nUnresponded Issues:</h3>` + 
+                            `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
         }
         // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
         //             `your repository's response time was better than 70% of the communities on Github!`;
