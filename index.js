@@ -225,10 +225,11 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
             }
             
+            console.log('overallBadge: ' + overallBadge);
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
-            var issueBody = `<p align="center">${overallBadge}\n>/p>` + 
+            var issueBody = `<p align="center">${overallBadge}\n></p>` + 
                             `<p align="center">${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
