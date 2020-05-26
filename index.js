@@ -5,15 +5,15 @@ const github = require("@actions/github");
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
 
 var badge_color_map = {
-    response_time: response_map,
-    unresponded: unresponded_map,
-    ave_comments: ave_comments_map
+    'response_time': response_map,
+    'unresponded': unresponded_map,
+    'ave_comments': ave_comments_map
 };
 
 var badge_name_map = {
-    'response_time': 'response%20time',
-    'unresponded': 'num%20unanswered',
-    'ave_comments': 'num%20comments'
+    response_time: 'response%20time',
+    unresponded: 'num%20unanswered',
+    ave_comments: 'num%20comments'
 }
 
 var response_map = {
@@ -90,7 +90,11 @@ function createBadge(badgeName, message) {
         color = 'yellow';
     } else {
         console.log('badgeName: ' + badgeName);
+        var color_map = badge_color_map[badgeName];
+        console.log('color_map: ' + color_map);
         var color_map = badge_color_map.badgeName;
+        console.log('color_map: ' + color_map);
+        var color_map = badge_color_map['response_time'];
         console.log('color_map: ' + color_map);
         color = color_map[message];
         label = badge_name_map;
