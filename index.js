@@ -95,9 +95,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         //     aveNumComments: 2
         // }
         // var prevTime = prevData.aveResponseTime;
-        prevTime = [5, 36];
-        console.log('currTime: ' + currTime);
-        console.log('prevTime: ' + prevTime);
+        // prevTime = [5, 36];
+        console.log('prevData: ' + JSON.stringify(prevData, null, 4));
+
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
