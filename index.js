@@ -81,6 +81,24 @@ function createBadge(badgeName, message, style='flat') {
     }
 }
 
+function createBadgeWithData(badgeName, status, data) {
+    var color;
+    if(status == 'no issues') {
+        color = 'grey';
+    }
+    if(status == 'same') {
+        color = 'yellow';
+    } else {
+        color = badge_color_map[badgeName][status];
+    }
+    var label = badge_name_map[badgeName];
+    if(style == 'flat') {        
+        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}">`;
+    } else {
+        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}&style=${style}">`
+    }
+}
+
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
@@ -114,7 +132,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('curr: ' + Math.floor(currData.unresponded/currData.total * 100));
             console.log('prev: ' + Math.floor(prevData.unresponded/prevData.total * 100));
             var numCommentsDifference = currData.aveNumComments - prevData.aveNumComments;
-            var overallChange, initMessage;
+            var overallChange, initMessage, badgeData;
             var overallChangeString;
 
             console.log("\n\n\n\n");
@@ -123,58 +141,73 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('numCommentsDifference: ' + numCommentsDifference);
 
             // response time decreased
+            if(currTime[1] == 0) {
+                if(currTime[0] == 1) {
+                    badgeData = `${currTime[1]} hr`;
+                } else {
+                    badgeData = `${currTime[1]} hrs`;
+                }
+            } else {
+                if(currTime[0] == 0) {
+                    badgeData = `${currTime[1]} mins`;
+                } else  {
+                    badgeData = `${currTime[0]} hr ${currTime[1]} mins`
+                }
+            }
             if(timeDifference > 0) {
                 console.log('\n1\n');
                 changes.push(-1);
-                responseTimeBadge = createBadge('response_time', 'slower');
+                responseTimeBadge = createBadgeWithData('response_time', 'slower', badgeData);
             }
             // response stayed the same
             if(timeDifference == 0) {
                 console.log('\n2\n');
                 changes.push(0);
-                responseTimeBadge = createBadge('response_time', 'same');
+                responseTimeBadge = createBadgeWithData('response_time', 'same', badgeData);
             }
             // response time increased
             if(timeDifference < 0) {
                 console.log('\n3\n');
                 changes.push(1);
-                responseTimeBadge = createBadge('response_time', 'faster');
+                responseTimeBadge = createBadgeWithData('response_time', 'faster', badgeData);
             }
             // more responded previous month
+            badgeData = `${currData.unresponded}/${currData.total}`;
             if(unrespondedDifference > 0) {
                 console.log('\n4\n');
                 changes.push(-1)
-                numUnrespondedBadge = createBadge('unresponded', 'increased');
+                numUnrespondedBadge = createBadgeWithData('unresponded', 'increased', badgeData);
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
                 console.log('\n5\n');
                 changes.push(0)
-                numUnrespondedBadge = createBadge('unresponded', 'same');
+                numUnrespondedBadge = createBadgeWithData('unresponded', 'same', badgeData);
             }
             // more responded this month
             if(unrespondedDifference < 0) {
                 console.log('\n6\n');
                 changes.push(1)
-                numUnrespondedBadge = createBadge('unresponded', 'decreased');
+                numUnrespondedBadge = createBadgeWithData('unresponded', 'decreased', badgeData);
             }
             // more comments this month
+            badgeData = currData.aveNumComments;
             if(numCommentsDifference > 0) {
                 console.log('\n7\n');
                 changes.push(1);
-                aveNumCommentsBadge = createBadge('ave_comments', 'increased');
+                aveNumCommentsBadge = createBadgeWithData('ave_comments', 'increased', badgeData);
             }
             // same comments
             if(numCommentsDifference == 0) {
                 console.log('\n8\n');
                 changes.push(0);
-                aveNumCommentsBadge = createBadge('ave_comments', 'same');
+                aveNumCommentsBadge = createBadgeWithData('ave_comments', 'same', badgeData);
             }
             // less comments this month
             if(numCommentsDifference < 0) {
                 console.log('\n9\n');
                 changes.push(-1);
-                aveNumCommentsBadge = createBadge('ave_comments', 'decreased');
+                aveNumCommentsBadge = createBadgeWithData('ave_comments', 'decreased', badgeData);
             }
 
             console.log('changes: ' + changes);
