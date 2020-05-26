@@ -4,18 +4,6 @@ const github = require("@actions/github");
 
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
 
-var badge_color_map = {
-    'response_time': response_map,
-    'unresponded': unresponded_map,
-    'ave_comments': ave_comments_map
-};
-
-var badge_name_map = {
-    response_time: 'response%20time',
-    unresponded: 'num%20unanswered',
-    ave_comments: 'num%20comments'
-}
-
 var response_map = {
     'faster': 'brightgreen',
     'slower': 'orange',
@@ -30,6 +18,18 @@ var ave_comments_map = {
     'increased': 'brightgreen',
     'decreased': 'orange'
 };
+
+var badge_color_map = {
+    'response_time': response_map,
+    'unresponded': unresponded_map,
+    'ave_comments': ave_comments_map
+};
+
+var badge_name_map = {
+    response_time: 'response%20time',
+    unresponded: 'num%20unanswered',
+    ave_comments: 'num%20comments'
+}
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
