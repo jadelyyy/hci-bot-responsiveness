@@ -86,21 +86,20 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         var issueBody;
         var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
         var currTime = currData.aveResponseTime;
-        // prevData = {
-        //     firstResponseTimes: [0],
-        //     total: 40,
-        //     unresponded: 32,
-        //     numComments: [2, 2],
-        //     aveResponseTime: [5, 47],
-        //     aveNumComments: 2
-        // }
-        // var prevTime = prevData.aveResponseTime;
-        // prevTime = [5, 36];
-        console.log('prevData: ' + JSON.stringify(prevData, null, 4));
+        prevData = {
+            firstResponseTimes: [0],
+            total: 40,
+            unresponded: 32,
+            numComments: [2, 2],
+            aveResponseTime: [5, 47],
+            aveNumComments: 2
+        }
+        var prevTime = prevData.aveResponseTime;
+        // console.log('prevData: ' + JSON.stringify(prevData, null, 4));
 
-        if (currTime == null) {
+        if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
-        } else if (prevTime == null) {
+        } else if (prevData.total == 0) {
             responseTimeBadge = createBadge('response_time', 'no issues');
             numUnrespondedBadge = createBadge('unresponded', 'no issues');
             aveNumCommentsBadge = createBadge('ave_comments', 'no issues');
@@ -108,7 +107,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
-            // var difference = currTime - prevTime;
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
             var percentTimeDifference = (Math.floor(Math.abs(timeDifference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
