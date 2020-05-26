@@ -167,7 +167,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 aveNumCommentsBadge = createBadge('ave_comments', 'increased');
             }
             // same comments
-            if(numCommentsDifference > 0) {
+            if(numCommentsDifference == 0) {
                 changes.push(0);
                 aveNumCommentsBadge = createBadge('ave_comments', 'same');
             }
@@ -225,7 +225,7 @@ function createIssue2(octokit, repoOwner, repoName, currData, prevData) {
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
-            responseTimeBadge = createBadge('response time', 'no_issues');
+            responseTimeBadge = createBadge('response_time', 'no_issues');
             numUnrespondedBadge = createBadge('unresponded', 'no_issues');
             aveNumCommentsBadge = createBadge('comments', 'no_issues');
             issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
