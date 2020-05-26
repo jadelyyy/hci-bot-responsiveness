@@ -154,6 +154,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                     badgeData = `${currTime[0]} hr ${currTime[1]} mins`
                 }
             }
+            console.log('badgeData: ' + badgeData);
             if(timeDifference > 0) {
                 console.log('\n1\n');
                 changes.push(-1);
@@ -172,7 +173,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 responseTimeBadge = createBadgeWithData('response_time', 'faster', badgeData);
             }
             // more responded previous month
-            badgeData = `${currData.unresponded}/${currData.total}`;
+            badgeData = `${currData.unresponded}/${currData.total} issues`;
+            console.log('badgeData: ' + badgeData);
             if(unrespondedDifference > 0) {
                 console.log('\n4\n');
                 changes.push(-1)
@@ -191,7 +193,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 numUnrespondedBadge = createBadgeWithData('unresponded', 'decreased', badgeData);
             }
             // more comments this month
-            badgeData = currData.aveNumComments;
+            badgeData = `${currData.aveNumComments} comments`;
+            console.log('badgeData: ' + badgeData);
             if(numCommentsDifference > 0) {
                 console.log('\n7\n');
                 changes.push(1);
