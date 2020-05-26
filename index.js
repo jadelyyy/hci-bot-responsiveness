@@ -74,6 +74,7 @@ function createBadge(badgeName, message, style='flat') {
         color = badge_color_map[badgeName][message];
     }
     var label = badge_name_map[badgeName];
+    message = message.replace(/ /g,"%20");
     if(style == 'flat') {        
         return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}">`;
     } else {
@@ -91,6 +92,7 @@ function createBadgeWithData(badgeName, status, data) {
     } else {
         color = badge_color_map[badgeName][status];
     }
+    data = data.replace(/ /g,"%20");
     var label = badge_name_map[badgeName];
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}">`;
 }
@@ -224,7 +226,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             if(overallChange < 0) {
                 overallChangeString = 'has not improved';
                 initMessage = '';
-                overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
+                overallBadge = createBadge('overall', 'did%20not%20improve', 'for-the-badge');
             }
             
             console.log('overallBadge: ' + overallBadge);
