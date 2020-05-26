@@ -83,6 +83,7 @@ function getOverallChange(changes) {
 
 function createBadge(badgeName, message) {
     var color;
+    var label;
     console.log('badgeName: ' + badgeName);
     console.log('message: ' + message);
     if(message == 'no issues') {
