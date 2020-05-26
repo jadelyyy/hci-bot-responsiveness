@@ -148,7 +148,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
-            var issueBody = `${numUnrespondedBadge}${responseTimeBadge}${numUnrespondedBadge}\n${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
+            var issueBody = `${numUnrespondedBadge}\n${initMessage} This month, your repository's overall responsivness ${overallChangeString} since last month. ` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `This month, your repository's metrics are: \n` +
                             `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
