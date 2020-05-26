@@ -215,7 +215,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
                             `<h1>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h1>` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
-                            `<h2>\nThis month, your repository's metrics are:</h2>` +
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                             `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
