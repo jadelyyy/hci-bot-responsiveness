@@ -78,6 +78,7 @@ function getOverallChange(changes) {
     for (var i = 0; i < changes.length; i++) {
         change += changes[i];
     }
+    console.log('calcuated change: ' + change);
     return change;
 }
 
@@ -88,9 +89,11 @@ function createBadge(badgeName, message) {
     console.log('message: ' + message);
     if(message == 'no issues') {
         color = 'grey';
+        label = badgeName;
     }
     if(message == 'same') {
         color = 'yellow';
+        label = badgeName;
     } else {
         var color_map = badge_color_map[badgeName];
         color = color_map[message];
@@ -194,16 +197,17 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 aveNumCommentsBadge = createBadge('ave_comments', 'decreased');
             }
 
+            console.log('changes: ' + changes);
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
                 initMessage = 'Great job!';
             }
-            if(overallChange > 0) {
+            if(overallChange == 0) {
                 overallChangeString = 'stayed the same';
                 initMessage = 'Not bad!';
             }
-            if(overallChange > 0) {
+            if(overallChange < 0) {
                 overallChangeString = 'did not improve';
                 initMessage = '';
             }
