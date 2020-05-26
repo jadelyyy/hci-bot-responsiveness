@@ -182,17 +182,17 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
                 initMessage = 'Great job!';
-                overallBadge = createBadge('overall', 'improved');
+                overallBadge = createBadge('overall', 'improved', 'for-the-badge');
             }
             if(overallChange == 0) {
                 overallChangeString = 'stayed the same';
                 initMessage = 'Not bad!';
-                overallBadge = createBadge('overall', 'same');
+                overallBadge = createBadge('overall', 'same', 'for-the-badge');
             }
             if(overallChange < 0) {
                 overallChangeString = 'has not improved';
                 initMessage = '';
-                overallBadge = createBadge('overall', 'did not improve');
+                overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
             }
             
             console.log('overallBadge: ' + overallBadge);
@@ -200,7 +200,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                            `<p align="center">${responseTimeBadge} ${numUnrespondedBadge} ${aveNumCommentsBadge}\n</p>` + 
+                            `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
