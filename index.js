@@ -91,6 +91,7 @@ function createBadge(badgeName, message) {
     } else {
         console.log('badgeName: ' + badgeName);
         var color_map = badge_color_map.badgeName;
+        console.log('color_map: ' + color_map);
         color = color_map[message];
         label = badge_name_map;
     }
