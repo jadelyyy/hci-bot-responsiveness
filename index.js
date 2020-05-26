@@ -105,7 +105,7 @@ function createBadge(badgeName, message, style='flat') {
     if(style == 'flat') {
         return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}"> </img>`;
     } else {
-        return `<img syle="display:block;margin-left:auto;margin-right:auto;" ` + 
+        return `<img align="center" ` + 
                 `src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}&style=${style}"> </img>`;
     }
 }
@@ -230,7 +230,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `${overallBadge}\n${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\n` + 
-                            `<h1>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h1>` + 
+                            `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
                             // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
