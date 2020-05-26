@@ -141,9 +141,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
             var percentTimeDifference = (Math.floor(Math.abs(timeDifference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
-            var unrespondedDifference = (Math.floor(currData.unresponded/currData.total)) - (Math.floor(prevData.unresponded/prevData.total));
-            console.log('curr: ' + Math.floor(currData.unresponded/currData.total));
-            console.log('prev: ' + Math.floor(prevData.unresponded/prevData.total));
+            var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
+            console.log('curr: ' + Math.floor(currData.unresponded/currData.total * 100));
+            console.log('prev: ' + Math.floor(prevData.unresponded/prevData.total * 100));
             var numCommentsDifference = currData.aveNumComments - prevData.aveNumComments;
             var overallChange, initMessage;
             var overallChangeString;
