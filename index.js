@@ -86,16 +86,16 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         var issueBody;
         var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
         var currTime = currData.aveResponseTime;
-        prevData = {
-            firstResponseTimes: [0],
-            total: 40,
-            unresponded: 32,
-            numComments: [2, 2],
-            aveResponseTime: [5, 47],
-            aveNumComments: 2
-        }
-        var prevTime = prevData.aveResponseTime;
-
+        // prevData = {
+        //     firstResponseTimes: [0],
+        //     total: 40,
+        //     unresponded: 32,
+        //     numComments: [2, 2],
+        //     aveResponseTime: [5, 47],
+        //     aveNumComments: 2
+        // }
+        // var prevTime = prevData.aveResponseTime;
+        prevTime = [5, 36];
         console.log('currTime: ' + currTime);
         console.log('prevTime: ' + prevTime);
         if (currTime == null) {
