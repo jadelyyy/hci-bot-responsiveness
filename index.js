@@ -67,8 +67,7 @@ function createBadge(badgeName, message, style='flat') {
     console.log('message: ' + message);
     if(message == 'no issues') {
         color = 'lightgrey';
-    }
-    if(message == 'same') {
+    } else if(message == 'same') {
         color = 'yellow';
     } else {
         color = badge_color_map[badgeName][message];
