@@ -152,7 +152,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             numUnrespondedBadge = createBadgeWithData('unresponded', 'no issues', badgeData);
 
-            badgeData = getCommentString(currData.aveNumComments);
+            badgeData = getCommentsString(currData.aveNumComments);
             aveNumCommentsBadge = createBadgeWithData('ave_comments', 'no issues', badgeData);
 
             overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
