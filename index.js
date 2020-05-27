@@ -83,6 +83,7 @@ function createBadge(badgeName, message, style='flat') {
 }
 
 function createBadgeWithData(badgeName, status, data) {
+    console.log('status: ' + status);
     var color;
     if(status == 'no issues') {
         color = 'lightgrey';
