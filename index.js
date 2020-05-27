@@ -134,7 +134,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         prevData = {
             firstResponseTimes: [0],
             total: 40,
-            unresponded: 32,
+            unresponded: 40,
             numComments: [2, 2],
             aveResponseTime: [5, 47],
             aveNumComments: 2
