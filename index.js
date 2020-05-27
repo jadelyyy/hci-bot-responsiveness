@@ -130,18 +130,16 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
         var badgeData;
         var currTime = currData.aveResponseTime;
-        // prevData = {
-        //     firstResponseTimes: [0],
-        //     total: 40,
-        //     unresponded: 32,
-        //     numComments: [2, 2],
-        //     aveResponseTime: [5, 47],
-        //     aveNumComments: 2
-        // }
+        prevData = {
+            firstResponseTimes: [0],
+            total: 40,
+            unresponded: 32,
+            numComments: [2, 2],
+            aveResponseTime: [5, 47],
+            aveNumComments: 2
+        }
         var prevTime = prevData.aveResponseTime;
         
-        // console.log('prevData: ' + JSON.stringify(prevData, null, 4));
-
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
         } else if (prevData.total == 0) {
@@ -172,8 +170,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
-            console.log('curr: ' + Math.floor(currData.unresponded/currData.total * 100));
-            console.log('prev: ' + Math.floor(prevData.unresponded/prevData.total * 100));
             var numCommentsDifference = currData.aveNumComments - prevData.aveNumComments;
             var overallChange, initMessage;
             var overallChangeString;
@@ -187,19 +183,16 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             // response time decreased
             console.log('badgeData: ' + badgeData);
             if(timeDifference > 0) {
-                console.log('\n1\n');
                 changes.push(-1);
                 responseTimeBadge = createBadgeWithData('response_time', 'slower', badgeData);
             }
             // response stayed the same
             if(timeDifference == 0) {
-                console.log('\n2\n');
                 changes.push(0);
                 responseTimeBadge = createBadgeWithData('response_time', 'same', badgeData);
             }
             // response time increased
             if(timeDifference < 0) {
-                console.log('\n3\n');
                 changes.push(1);
                 responseTimeBadge = createBadgeWithData('response_time', 'faster', badgeData);
             }
@@ -207,44 +200,36 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             console.log('badgeData: ' + badgeData);
             if(unrespondedDifference > 0) {
-                console.log('\n4\n');
                 changes.push(-1)
                 numUnrespondedBadge = createBadgeWithData('unresponded', 'increased', badgeData);
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
-                console.log('\n5\n');
                 changes.push(0)
                 numUnrespondedBadge = createBadgeWithData('unresponded', 'same', badgeData);
             }
             // more responded this month
             if(unrespondedDifference < 0) {
-                console.log('\n6\n');
                 changes.push(1)
                 numUnrespondedBadge = createBadgeWithData('unresponded', 'decreased', badgeData);
             }
             // more comments this month
             badgeData = getCommentsString(currData.aveNumComments);
-            console.log('badgeData: ' + badgeData);
             if(numCommentsDifference > 0) {
-                console.log('\n7\n');
                 changes.push(1);
                 aveNumCommentsBadge = createBadgeWithData('ave_comments', 'increased', badgeData);
             }
             // same comments
             if(numCommentsDifference == 0) {
-                console.log('\n8\n');
                 changes.push(0);
                 aveNumCommentsBadge = createBadgeWithData('ave_comments', 'same', badgeData);
             }
             // less comments this month
             if(numCommentsDifference < 0) {
-                console.log('\n9\n');
                 changes.push(-1);
                 aveNumCommentsBadge = createBadgeWithData('ave_comments', 'decreased', badgeData);
             }
 
-            console.log('changes: ' + changes);
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
@@ -291,8 +276,6 @@ function createIssue2(octokit, repoOwner, repoName, currData, prevData) {
         var currTime = currData.aveResponseTime;
         var prevTime = [5, 47]; 
 
-        console.log('currTime: ' + currTime);
-        console.log('prevTime: ' + prevTime);
         if (currTime == null) {
             issueBody = `There were no issues created this month.`;
         } else if (prevTime == null) {
@@ -302,7 +285,6 @@ function createIssue2(octokit, repoOwner, repoName, currData, prevData) {
             issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
                         `your repository's response time was better than 70% of the communities on Github!`;
         } else {
-            // var difference = currTime - prevTime;
             var difference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
             var percentDifference = (Math.floor(Math.abs(difference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
             var change, initMessage;
