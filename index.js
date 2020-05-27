@@ -87,8 +87,7 @@ function createBadgeWithData(badgeName, status, data) {
     var color;
     if(status == 'no issues') {
         color = 'lightgrey';
-    }
-    if(status == 'same') {
+    } else if(status == 'same') {
         color = 'yellow';
     } else {
         color = badge_color_map[badgeName][status];
