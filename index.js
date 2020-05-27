@@ -66,7 +66,7 @@ function createBadge(badgeName, message, style='flat') {
     console.log('badgeName: ' + badgeName);
     console.log('message: ' + message);
     if(message == 'no issues') {
-        color = 'lightgrey';
+        color = 'blue';
     } else if(message == 'same') {
         color = 'yellow';
     } else {
@@ -85,7 +85,7 @@ function createBadgeWithData(badgeName, status, data) {
     console.log('status: ' + status);
     var color;
     if(status == 'no issues') {
-        color = 'lightgrey';
+        color = 'blue';
     } else if(status == 'same') {
         color = 'yellow';
     } else {
