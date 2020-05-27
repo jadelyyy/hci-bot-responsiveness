@@ -157,6 +157,10 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
             overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
 
+            console.log('responseTimeBadge: ' + responseTimeBadge);
+            console.log('\nnumUnrespondedBadge: ' + numUnrespondedBadge);
+            console.log('\naveNumCommentsBadge: ' + aveNumCommentsBadge);
+
             issueBody = `<p align="center">${overallBadge}\n</p>` + 
                         `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
                         `<h2>Great job this month! There were no issues created in the previous month, but you can check your progress again next month!</h>` + 
