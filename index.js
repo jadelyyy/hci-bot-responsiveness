@@ -262,13 +262,10 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                             `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
-                            `<p>\nAverage response time: ${currTime[0]} hours and ${currTime[1]} minutes </p>` + 
-                            `<p style="text-align:right"><b>${responseTimeStatus.toUpperCase()}</b></p>` +
-                            `<p>\nAverage number of comments per issue: ${currData.aveNumComments}</p>` + 
-                            `<p style="text-align:right"><b>${aveNumCommentsStatus.toUpperCase()}</b></p>` +
+                            `<p>\n<b>${responseTimeStatus.toUpperCase()}</b>Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
+                            `<p>\n<b>${aveNumCommentsStatus.toUpperCase()}</b>Average number of comments per issue: ${currData.aveNumComments}</p>` + 
                             `<h3>\nUnresponded Issues:</h3>` + 
-                            `<p>\nNumber of unresponded issues: ${currData.unresponded}/${currData.total}</p>` + 
-                            `<p style="text-align:right"><b>${numUnrespondedStatus.toUpperCase()}</b></p>`;
+                            `<p>\n<b>${numUnrespondedStatus.toUpperCase()}</b>Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
         }
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
