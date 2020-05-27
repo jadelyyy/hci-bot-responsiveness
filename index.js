@@ -128,6 +128,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
         var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
+        var responseTimeStatus, numUnrespondedStatus, aveNumCommentsStatus, overallStatus;
         var badgeData;
         var currTime = currData.aveResponseTime;
         prevData = {
@@ -179,73 +180,79 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('unrespondedDifference: ' + unrespondedDifference);
             console.log('numCommentsDifference: ' + numCommentsDifference);
 
-            badgeData = getTimeString(currTime);
             // response time decreased
-            console.log('badgeData: ' + badgeData);
             if(timeDifference > 0) {
                 changes.push(-1);
-                responseTimeBadge = createBadgeWithData('response_time', 'slower', badgeData);
+                responseTimeStatus = 'slower';
             }
             // response stayed the same
             if(timeDifference == 0) {
                 changes.push(0);
-                responseTimeBadge = createBadgeWithData('response_time', 'same', badgeData);
+                responseTimeStatus = 'same';
             }
             // response time increased
             if(timeDifference < 0) {
                 changes.push(1);
-                responseTimeBadge = createBadgeWithData('response_time', 'faster', badgeData);
+                responseTimeStatus = 'faster';
             }
             // more responded previous month
-            badgeData = `${currData.unresponded}/${currData.total} issues`;
-            console.log('badgeData: ' + badgeData);
             if(unrespondedDifference > 0) {
                 changes.push(-1)
-                numUnrespondedBadge = createBadgeWithData('unresponded', 'increased', badgeData);
+                numUnrespondedStatus = 'increased';
             }
             // number of responses stayed the same
             if(unrespondedDifference == 0) {
                 changes.push(0)
-                numUnrespondedBadge = createBadgeWithData('unresponded', 'same', badgeData);
+                numUnrespondedStatus = 'same';
             }
             // more responded this month
             if(unrespondedDifference < 0) {
                 changes.push(1)
-                numUnrespondedBadge = createBadgeWithData('unresponded', 'decreased', badgeData);
+                numUnrespondedStatus = 'decreased';
             }
             // more comments this month
-            badgeData = getCommentsString(currData.aveNumComments);
             if(numCommentsDifference > 0) {
                 changes.push(1);
-                aveNumCommentsBadge = createBadgeWithData('ave_comments', 'increased', badgeData);
+                aveNumCommentsStatus = 'increased';
             }
             // same comments
             if(numCommentsDifference == 0) {
                 changes.push(0);
-                aveNumCommentsBadge = createBadgeWithData('ave_comments', 'same', badgeData);
+                aveNumCommentsStatus = 'same';
             }
             // less comments this month
             if(numCommentsDifference < 0) {
                 changes.push(-1);
-                aveNumCommentsBadge = createBadgeWithData('ave_comments', 'decreased', badgeData);
+                aveNumCommentsStatus = 'decreased';
             }
 
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
                 initMessage = 'Great job!';
-                overallBadge = createBadge('overall', 'improved', 'for-the-badge');
+                overallStatus = 'improved';
             }
             if(overallChange == 0) {
                 overallChangeString = 'stayed the same';
                 initMessage = 'Not bad!';
-                overallBadge = createBadge('overall', 'same', 'for-the-badge');
+                overallStatus = 'same';
             }
             if(overallChange < 0) {
                 overallChangeString = 'has not improved';
                 initMessage = '';
-                overallBadge = createBadge('overall', 'did not improve', 'for-the-badge');
+                overallStatus = 'did not improve';
             }
+
+            badgeData = getTimeString(currTime);
+            responseTimeBadge = createBadgeWithData('response_time', responseTimeStatus, badgeData);
+
+            badgeData = `${currData.unresponded}/${currData.total} issues`;
+            numUnrespondedBadge = createBadgeWithData('unresponded', numUnrespondedStatus, badgeData);
+
+            badgeData = getCommentsString(currData.aveNumComments);
+            aveNumCommentsBadge = createBadgeWithData('ave_comments', aveNumCommentsStatus, badgeData);
+
+            overallBadge = createBadge('overall', overallStatus, 'for-the-badge');
             
             console.log('overallBadge: ' + overallBadge);
             console.log('responseTimeBadge: ' + responseTimeBadge);
@@ -255,10 +262,10 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                             `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
-                            `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
-                            `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
+                            `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes <b>${responseTimeStatus}</b></p>` + 
+                            `<p>\n    Average number of comments per issue: ${currData.aveNumComments} <b>${aveNumCommentsStatus}</b></p>` + 
                             `<h3>\nUnresponded Issues:</h3>` + 
-                            `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+                            `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total} <b>${numUnrespondedStatus}</b></p>`;
         }
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
