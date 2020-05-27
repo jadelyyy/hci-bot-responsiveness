@@ -97,40 +97,82 @@ function createBadgeWithData(badgeName, status, data) {
     return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}">`;
 }
 
+function getTimeString(time) {
+    var timeString;
+    if(time[1] == 0) {
+        if(time[0] == 1) {
+            timeString = `${time[1]} hr`;
+        } else {
+            timeString = `${time[1]} hrs`;
+        }
+    } else {
+        if(currTime[0] == 0) {
+            timeString = `${time[1]} mins`;
+        } else  {
+            timeString = `${time[0]} hr ${time[1]} mins`
+        }
+    }
+    return timeString;
+}
+
+function getCommentsString(numComments) {
+    var commentsString;
+    if(numComments == 1) {
+        commentsString = `${numComments} comment`;
+    } else {
+        commentsString = `${numComments} comments`;
+    }
+    return commentsString;
+}
+
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
         var issueBody;
         var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
+        var badgeData;
         var currTime = currData.aveResponseTime;
-        prevData = {
-            firstResponseTimes: [0],
-            total: 40,
-            unresponded: 32,
-            numComments: [2, 2],
-            aveResponseTime: [5, 47],
-            aveNumComments: 2
-        }
+        // prevData = {
+        //     firstResponseTimes: [0],
+        //     total: 40,
+        //     unresponded: 32,
+        //     numComments: [2, 2],
+        //     aveResponseTime: [5, 47],
+        //     aveNumComments: 2
+        // }
         var prevTime = prevData.aveResponseTime;
+        
         // console.log('prevData: ' + JSON.stringify(prevData, null, 4));
 
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
         } else if (prevData.total == 0) {
-            responseTimeBadge = createBadge('response_time', 'no issues');
-            numUnrespondedBadge = createBadge('unresponded', 'no issues');
-            aveNumCommentsBadge = createBadge('ave_comments', 'no issues');
+            badgeData = getTimeString(currTime);
+            responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
+
+            badgeData = `${currData.unresponded}/${currData.total} issues`;
+            numUnrespondedBadge = createBadgeWithData('unresponded', 'no issues', badgeData);
+
+            badgeData = getCommentString(currData.aveNumComments);
+            aveNumCommentsBadge = createBadgeWithData('ave_comments', 'no issues', badgeData);
+
             overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
-            issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
-                        `your repository's response time was better than 70% of the communities on Github!`;
+
+            issueBody = `<p align="center">${overallBadge}\n</p>` + 
+                        `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
+                        `<h2>Great job this month! There were no issues created in the previous month, but you can check your progress again next month!</h>` + 
+                        `<h3>\nResponded Issues: </h3>` + 
+                        `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
+                        `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
+                        `<h3>\nUnresponded Issues:</h3>` + 
+                        `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
         } else {
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
-            var percentTimeDifference = (Math.floor(Math.abs(timeDifference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
             console.log('curr: ' + Math.floor(currData.unresponded/currData.total * 100));
             console.log('prev: ' + Math.floor(prevData.unresponded/prevData.total * 100));
             var numCommentsDifference = currData.aveNumComments - prevData.aveNumComments;
-            var overallChange, initMessage, badgeData;
+            var overallChange, initMessage;
             var overallChangeString;
 
             console.log("\n\n\n\n");
@@ -138,20 +180,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             console.log('unrespondedDifference: ' + unrespondedDifference);
             console.log('numCommentsDifference: ' + numCommentsDifference);
 
+            badgeData = getTimeString(currTime);
             // response time decreased
-            if(currTime[1] == 0) {
-                if(currTime[0] == 1) {
-                    badgeData = `${currTime[1]} hr`;
-                } else {
-                    badgeData = `${currTime[1]} hrs`;
-                }
-            } else {
-                if(currTime[0] == 0) {
-                    badgeData = `${currTime[1]} mins`;
-                } else  {
-                    badgeData = `${currTime[0]} hr ${currTime[1]} mins`
-                }
-            }
             console.log('badgeData: ' + badgeData);
             if(timeDifference > 0) {
                 console.log('\n1\n');
@@ -191,7 +221,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 numUnrespondedBadge = createBadgeWithData('unresponded', 'decreased', badgeData);
             }
             // more comments this month
-            badgeData = `${currData.aveNumComments} comments`;
+            badgeData = getCommentsString(currData.aveNumComments);
             console.log('badgeData: ' + badgeData);
             if(numCommentsDifference > 0) {
                 console.log('\n7\n');
