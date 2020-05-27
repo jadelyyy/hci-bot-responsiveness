@@ -106,7 +106,7 @@ function getTimeString(time) {
             timeString = `${time[1]} hrs`;
         }
     } else {
-        if(currTime[0] == 0) {
+        if(time[0] == 0) {
             timeString = `${time[1]} mins`;
         } else  {
             timeString = `${time[0]} hr ${time[1]} mins`
