@@ -1,10 +1,27 @@
 const { Octokit } = require("@octokit/rest");
 const core = require("@actions/core");
 const github = require("@actions/github");
+const infoRepoOwner = 'jadelyyy';
+const infoRepoName = 'responsiveness-info';
 
 const {badge_color_map, badge_name_map} = require("./badgeData.js");
 
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
+
+var month_name_map = {
+    0: 'January',
+    1: 'February',
+    2: 'March',
+    3: 'April',
+    4: 'May',
+    5: 'June',
+    6: 'July',
+    7: 'August',
+    8: 'September',
+    9: 'October',
+    10: 'November',
+    11: 'December'
+}
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -127,14 +144,14 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         var responseTimeStatus, numUnrespondedStatus, aveNumCommentsStatus, overallStatus;
         var badgeData;
         var currTime = currData.aveResponseTime;
-        prevData = {
-            firstResponseTimes: [0],
-            total: 40,
-            unresponded: 40,
-            numComments: [2, 2],
-            aveResponseTime: [5, 47],
-            aveNumComments: 2
-        }
+        // prevData = {
+        //     firstResponseTimes: [0],
+        //     total: 40,
+        //     unresponded: 40,
+        //     numComments: [2, 2],
+        //     aveResponseTime: [5, 47],
+        //     aveNumComments: 2
+        // }
         var prevTime = prevData.aveResponseTime;
         
         if (currData.total == 0) {
@@ -157,12 +174,18 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
             issueBody = `<p align="center">${overallBadge}\n</p>` + 
                         `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
-                        `<h2>Great job this month! There were no issues created in the previous month, but you can check your progress again next month!</h>` + 
-                        `<h3>\nResponded Issues: </h3>` + 
-                        `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
-                        `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
-                        `<h3>\nUnresponded Issues:</h3>` + 
-                        `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+                        `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet, but be sure to check again next month!</h>`;
+                        // `<h3>\nResponded Issues: </h3>` + 
+                        // `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
+                        // `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
+                        // `<h3>\nUnresponded Issues:</h3>` + 
+                        // `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+
+            const additionalIssueData = {
+                'currData': currData
+            }
+            yield createAdditionalIssue(octokit, repoName, additionalIssueData);
+
         } else {
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
@@ -267,6 +290,51 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             owner: repoOwner,
             repo: repoName,
             title: 'Monthly Responsiveness Update',
+            body: issueBody
+        });
+
+        const additionalIssueData = {
+            'responseTimeStatus': responseTimeStatus,
+            'aveNumCommentsStatus': aveNumCommentsStatus,
+            'numUnrespondedStatus': numUnrespondedStatus,
+            'currData': currData,
+            'prevData': prevData
+        }
+
+        yield updateAdditionalInfo(octokit, repoName, additionalIssueData);
+    });
+}
+
+// function updateAdditionalInfo(octokit, repoName, additionalIssueData) {
+//     return __awaiter(this, void 0, void 0, function* () {
+//         const date = new Date();
+//         var month = date.getMonth();
+//         if(month == 0) {
+//             month = 11;
+//         }
+        
+//     });
+// }
+
+function createAdditionalIssue(octokit, repoName, additionalIssueData) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const date = new Date();
+        var month = date.getMonth();
+        if(month == 0) {
+            month = 11;
+        }
+        const currData = additionalIssueData.currData;
+        var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
+                        `<h2>${month_name_map[month]}\n</h2>` + 
+                        `<h3>\nResponded Issues: </h3>` + 
+                        `<p>\n    Average response time: ${currData.currTime[0]} hours and ${currData.currTime[1]} minutes</p>` + 
+                        `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
+                        `<h3>\nUnresponded Issues:</h3>` + 
+                        `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+        const {data: issue} = yield octokit.issues.create({
+            owner: infoRepoOwner,
+            repo: infoRepoName,
+            title: repoName,
             body: issueBody
         });
     });
