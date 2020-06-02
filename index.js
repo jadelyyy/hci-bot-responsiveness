@@ -334,7 +334,7 @@ function updateAdditionalInfo(repoName, additionalIssueData) {
         var numUnrespondedStatus = additionalIssueData.numUnrespondedStatus;
         var currData = additionalIssueData.currData;
         var currTime = currData.aveResponseTime;
-        var additionalBody = `\n<h2>${month_name_map[month]}\n</h2>` + 
+        var commentBody = `\n<h2>${month_name_map[month]}\n</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\nAverage response time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                             `<p>\nAverage number of comments per issue <b>(${aveNumCommentsStatus.toUpperCase()})</b>: ${currData.aveNumComments}</p>` + 
@@ -344,7 +344,12 @@ function updateAdditionalInfo(repoName, additionalIssueData) {
         if(currIssue) {
             console.log('issue title .... ' + currIssue.title);
             var issueNumber = currIssue.number;
-            var issueBody = currIssue.body;
+            newOctokit.issues.createComment({
+                owner: infoRepoOwner,
+                repo: infoRepoName,
+                issue_number: issueNumber,
+                body: commentBody
+            })
         }
     });
 }
