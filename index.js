@@ -158,6 +158,12 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
         } else if (prevData.total == 0) {
+
+            const additionalIssueData = {
+                'currData': currData
+            }
+            yield createAdditionalIssue(octokit, repoName, additionalIssueData);
+            
             badgeData = getTimeString(currTime);
             responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
 
@@ -182,10 +188,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                         // `<h3>\nUnresponded Issues:</h3>` + 
                         // `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
 
-            const additionalIssueData = {
-                'currData': currData
-            }
-            yield createAdditionalIssue(octokit, repoName, additionalIssueData);
 
         } else {
             var changes = [];
@@ -319,6 +321,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
 function createAdditionalIssue(octokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log('print rate limit...\n\n');
+        console.log(octokit.rateLimit.get());
         const date = new Date();
         var month = date.getMonth();
         if(month == 0) {
