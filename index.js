@@ -329,7 +329,7 @@ function createAdditionalIssue(octokit, repoName, additionalIssueData) {
         var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
                         `<h2>${month_name_map[month]}\n</h2>` + 
                         `<h3>\nResponded Issues: </h3>` + 
-                        `<p>\n    Average response time: ${currData.currTime[0]} hours and ${currData.currTime[1]} minutes</p>` + 
+                        `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                         `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
                         `<h3>\nUnresponded Issues:</h3>` + 
                         `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
