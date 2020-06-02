@@ -293,7 +293,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
                             `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.\n</h2>` + 
-                            `<p>For more information on your repository's progress, visit <a href="${additionalInfoIssue.html_url}"></p>`
+                            `<p>For more information on your repository's progress, visit <a href="${additionalInfoIssue.html_url}">${repoName}'s Additional Responsiveness Info</a></p>`
         }
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
