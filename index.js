@@ -582,7 +582,7 @@ function run () {
             console.log('Total Number of Issues: ' + issues.length);
 
             var currDate = new Date();
-            console.log('\noriginal baseDate: ' + baseDate);
+            console.log('\noriginal currDate: ' + currDate);
             var currMonth = currDate.getMonth();
             var baseMonth = currMonth - 1;
             var baseYear = currDate.getYear();
