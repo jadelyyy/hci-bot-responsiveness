@@ -282,7 +282,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
                 'prevData': prevData
             }
     
-            yield updateAdditionalInfo(newOctokit, repoName, additionalIssueData);
+            yield updateAdditionalIssue(newOctokit, repoName, additionalIssueData);
             
             var additionalInfoIssue = yield getExistingIssue(newOctokit, repoName);
             console.log('issue URL: ' + additionalInfoIssue.html_url);
@@ -319,21 +319,20 @@ function getExistingIssue(newOctokit, repoName) {
     });
 }
 
-function updateAdditionalInfo(newOctokit, repoName, additionalIssueData) {
+function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
-        const date = new Date();
-        var month = date.getMonth();
-        if(month == 0) {
-            month = 11;
-        } else {
-            month -= 1;
+        const currDate = new Date();
+        var currMonth = currDate.getMonth();
+        var issueMonth = currMonth - 1;
+        if(issueMonth < 0) {
+            issueMonth = 11;
         }
         var responseTimeStatus = additionalIssueData.responseTimeStatus;
         var aveNumCommentsStatus = additionalIssueData.aveNumCommentsStatus;
         var numUnrespondedStatus = additionalIssueData.numUnrespondedStatus;
         var currData = additionalIssueData.currData;
         var currTime = currData.aveResponseTime;
-        var commentBody = `\n<h2>${month_name_map[month]}\n</h2>` + 
+        var commentBody = `\n<h2>${month_name_map[issueMonth]}\n</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\nAverage response time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                             `<p>\nAverage number of comments per issue <b>(${aveNumCommentsStatus.toUpperCase()})</b>: ${currData.aveNumComments}</p>` + 
@@ -355,17 +354,16 @@ function updateAdditionalInfo(newOctokit, repoName, additionalIssueData) {
 
 function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
-        const date = new Date();
-        var month = date.getMonth();
-        if(month == 0) {
-            month = 11;
-        } else {
-            month -= 1;
+        const currDate = new Date();
+        var currMonth = currDate.getMonth();
+        var issueMonth = currMonth - 1;
+        if(issueMonth < 0) {
+            issueMonth = 11;
         }
         const currData = additionalIssueData.currData;
         const currTime = currData.aveResponseTime;
         var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
-                        `<h2>${month_name_map[month]}\n</h2>` + 
+                        `<h2>${month_name_map[issueMonth]}\n</h2>` + 
                         `<h3>\nResponded Issues: </h3>` + 
                         `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                         `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
