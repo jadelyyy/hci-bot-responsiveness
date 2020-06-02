@@ -325,6 +325,7 @@ function createAdditionalIssue(octokit, repoName, additionalIssueData) {
             month = 11;
         }
         const currData = additionalIssueData.currData;
+        const currTime = currData.aveResponseTime;
         var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
                         `<h2>${month_name_map[month]}\n</h2>` + 
                         `<h3>\nResponded Issues: </h3>` + 
