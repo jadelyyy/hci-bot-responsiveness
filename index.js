@@ -140,6 +140,10 @@ function getCommentsString(numComments) {
 
 function createIssue(octokit, repoOwner, repoName, currData, prevData) {
     return __awaiter(this, void 0, void 0, function* () {
+        const additionalToken  = core.getInput('additional-token');
+        var newOctokit = new Octokit({
+            auth: additionalToken
+        });
         var issueBody;
         var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
         var responseTimeStatus, numUnrespondedStatus, aveNumCommentsStatus, overallStatus;
@@ -163,7 +167,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             const additionalIssueData = {
                 'currData': currData
             }
-            yield createAdditionalIssue(repoName, additionalIssueData);
+            yield createAdditionalIssue(newOctokit, repoName, additionalIssueData);
             
             badgeData = getTimeString(currTime);
             responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
@@ -269,19 +273,27 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             aveNumCommentsBadge = createBadgeWithData('ave_comments', aveNumCommentsStatus, badgeData);
 
             overallBadge = createBadge('overall', overallStatus, 'for-the-badge');
+
+            const additionalIssueData = {
+                'responseTimeStatus': responseTimeStatus,
+                'aveNumCommentsStatus': aveNumCommentsStatus,
+                'numUnrespondedStatus': numUnrespondedStatus,
+                'currData': currData,
+                'prevData': prevData
+            }
+    
+            yield updateAdditionalInfo(newOctokit, repoName, additionalIssueData);
             
+            var additionalInfoIssue = yield getExistingIssue(newOctokit, repoName);
+            console.log('issue URL: ' + additionalInfoIssue.html_url);
             console.log('overallBadge: ' + overallBadge);
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
                             `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
-                            `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.</h2>` + 
-                            `<h3>\nResponded Issues: </h3>` + 
-                            `<p>\nAverage response time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
-                            `<p>\nAverage number of comments per issue <b>(${aveNumCommentsStatus.toUpperCase()})</b>: ${currData.aveNumComments}</p>` + 
-                            `<h3>\nUnresponded Issues:</h3>` + 
-                            `<p>\nNumber of unresponded issues <b>(${numUnrespondedStatus.toUpperCase()})</b>: ${currData.unresponded}/${currData.total}</p>`;
+                            `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.\n</h2>` + 
+                            `<p>For more information on your repository's progress, visit <a href="${additionalInfoIssue.html_url}"></p>`
         }
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
@@ -290,15 +302,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             body: issueBody
         });
 
-        const additionalIssueData = {
-            'responseTimeStatus': responseTimeStatus,
-            'aveNumCommentsStatus': aveNumCommentsStatus,
-            'numUnrespondedStatus': numUnrespondedStatus,
-            'currData': currData,
-            'prevData': prevData
-        }
-
-        yield updateAdditionalInfo(repoName, additionalIssueData);
     });
 }
 
@@ -316,12 +319,8 @@ function getExistingIssue(newOctokit, repoName) {
     });
 }
 
-function updateAdditionalInfo(repoName, additionalIssueData) {
+function updateAdditionalInfo(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
-        const additionalToken  = core.getInput('additional-token');
-        var newOctokit = new Octokit({
-            auth: additionalToken
-        });
         const date = new Date();
         var month = date.getMonth();
         if(month == 0) {
@@ -354,13 +353,8 @@ function updateAdditionalInfo(repoName, additionalIssueData) {
     });
 }
 
-function createAdditionalIssue(repoName, additionalIssueData) {
+function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
-
-        const additionalToken  = core.getInput('additional-token');
-        var newOctokit = new Octokit({
-            auth: additionalToken
-        });
         const date = new Date();
         var month = date.getMonth();
         if(month == 0) {
