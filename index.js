@@ -145,16 +145,16 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         var responseTimeStatus, numUnrespondedStatus, aveNumCommentsStatus, overallStatus;
         var badgeData;
         var currTime = currData.aveResponseTime;
-        prevData = {
-            firstResponseTimes: [0],
-            total: 40,
-            unresponded: 40,
-            numComments: [2, 2],
-            aveResponseTime: [5, 47],
-            aveNumComments: 2
-        }
-        prevData.total = 0;
-        var prevTime = prevData.aveResponseTime;
+        // prevData = {
+        //     firstResponseTimes: [0],
+        //     total: 40,
+        //     unresponded: 40,
+        //     numComments: [2, 2],
+        //     aveResponseTime: [5, 47],
+        //     aveNumComments: 2
+        // }
+        // prevData.total = 0;
+        // var prevTime = prevData.aveResponseTime;
         
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
