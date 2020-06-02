@@ -437,7 +437,7 @@ function createIssue2(octokit, repoOwner, repoName, currData, prevData) {
     });
 }
 
-function isWithinMonth(creationDate, baseDate) {
+function isWithinMonth2(creationDate, baseDate) {
     try {
         if (baseDate.getYear() % 4 == 0) {
             month_map[1] = 29; 
@@ -471,6 +471,16 @@ function isWithinMonth(creationDate, baseDate) {
     }
 }
 
+function isWithinMonth(creationDate, baseMonth, baseYear) {
+    var creationMonth = creationDate.getMonth();
+    var creationYear = creationDate.getYear();
+    if(creationMonth == baseMonth && creationYear == baseYear) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 function getCommentsData(octokit, repoOwner, repoName, issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         const {data: comments} = yield octokit.issues.listComments({
@@ -500,7 +510,7 @@ function getCommentsData(octokit, repoOwner, repoName, issueNumber) {
     });
 }
 
-function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
+function getIssuesData(octokit, repoOwner, repoName, issues, baseMonth, baseYear) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             var firstResponseTimes = [];
@@ -513,7 +523,7 @@ function getIssuesData(octokit, repoOwner, repoName, issues, baseDate) {
                 issue = issues[i];
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
-                if(!isWithinMonth(issueCreationDate, baseDate)) {
+                if(!isWithinMonth(issueCreationDate, baseMonth, baseYear)) {
                     continue;
                 }
                 total += 1;
@@ -571,10 +581,19 @@ function run () {
 
             console.log('Total Number of Issues: ' + issues.length);
 
-            var baseDate = new Date();
+            var currDate = new Date();
             console.log('\noriginal baseDate: ' + baseDate);
-            // var currMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
-            var currMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+            var currMonth = currDate.getMonth();
+            var baseMonth = currMonth - 1;
+            var baseYear = currDate.getYear();
+            if(baseMonth < 0) {
+                baseMonth = 11;
+                baseYear -= 1;
+            }
+
+            console.log("baseMonth: " + baseMonth);
+            console.log("baseYear: " + baseYear);
+            var currMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
             var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
             console.log('currMonthResponseTimes Array: ' + currMonthIssuesData.firstResponseTimes);
             console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
@@ -585,22 +604,15 @@ function run () {
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
             currMonthIssuesData.aveNumComments = getAverageNumComments(currMonthIssuesData.numComments);
 
-            if (baseDate.getMonth() == 1) {
-                var prevMonth = 11;
-            } else {
-                var prevMonth = baseDate.getMonth() - 1;
+            baseMonth -= 1;
+            if(baseMonth < 0) {
+                baseMonth = 11;
+                baseYear -= 1;
             }
-            var prevDay = Math.max(month_map[prevMonth] - (31 - baseDate.getDate()) + 1, 1);
-            if(prevMonth == 11) {
-                baseDate.setYear(baseDate.getYear() - 1)
-            }
+            console.log("new baseMonth: " + baseMonth);
+            console.log("new baseYear: " + baseYear);
 
-            baseDate.setDate(prevDay);
-            baseDate.setMonth(prevMonth);
-            console.log('\nnew BaseDate: ' + baseDate);
-
-            // var prevMonthResponseTimes = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
-            var prevMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseDate);
+            var prevMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
             console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
             console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
