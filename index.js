@@ -321,8 +321,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
 function createAdditionalIssue(octokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log('print rate limit...\n\n');
-        console.log(octokit.rateLimit.get());
+
+        const userToken  = core.getInput('repo-token');
+        var newOctokit = new github.GitHub(userToken);
         const date = new Date();
         var month = date.getMonth();
         if(month == 0) {
@@ -337,7 +338,10 @@ function createAdditionalIssue(octokit, repoName, additionalIssueData) {
                         `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
                         `<h3>\nUnresponded Issues:</h3>` + 
                         `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
-        const {data: issue} = yield octokit.issues.create({
+
+        console.log('owner: ' + infoRepoOwner);
+        console.log('repo name: ' + infoRepoName);
+        const {data: issue} = yield newOctokit.issues.create({
             owner: infoRepoOwner,
             repo: infoRepoName,
             title: repoName,
