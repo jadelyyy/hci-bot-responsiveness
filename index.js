@@ -322,7 +322,6 @@ function getExistingIssue(newOctokit, repoName) {
 function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
         const currDate = new Date();
-        currDate.setMonth(4);
         var currMonth = currDate.getMonth();
         var issueMonth = currMonth - 1;
         if(issueMonth < 0) {
@@ -356,7 +355,6 @@ function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
 function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
         const currDate = new Date();
-        currDate.setMonth(4);
         var currMonth = currDate.getMonth();
         var issueMonth = currMonth - 1;
         if(issueMonth < 0) {
@@ -583,7 +581,6 @@ function run () {
 
             var currDate = new Date();
             console.log('\noriginal currDate: ' + currDate);
-            currDate.setMonth(4);
             var currMonth = currDate.getMonth();
             var baseMonth = currMonth - 1;
             var baseYear = currDate.getYear();
