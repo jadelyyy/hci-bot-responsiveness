@@ -79,6 +79,7 @@ function createBadge(badgeName, message, style='flat') {
     console.log('badgeName: ' + badgeName);
     console.log('message: ' + message);
     if(message == 'no issues') {
+        message = 'no issues last month';
         color = 'blue';
     } else if(message == 'same') {
         color = 'yellow';
@@ -144,14 +145,14 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         var responseTimeStatus, numUnrespondedStatus, aveNumCommentsStatus, overallStatus;
         var badgeData;
         var currTime = currData.aveResponseTime;
-        // prevData = {
-        //     firstResponseTimes: [0],
-        //     total: 40,
-        //     unresponded: 40,
-        //     numComments: [2, 2],
-        //     aveResponseTime: [5, 47],
-        //     aveNumComments: 2
-        // }
+        prevData = {
+            firstResponseTimes: [0],
+            total: 40,
+            unresponded: 40,
+            numComments: [2, 2],
+            aveResponseTime: [5, 47],
+            aveNumComments: 2
+        }
         prevData.total = 0;
         var prevTime = prevData.aveResponseTime;
         
@@ -162,7 +163,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             const additionalIssueData = {
                 'currData': currData
             }
-            yield createAdditionalIssue(octokit, repoName, additionalIssueData);
+            yield createAdditionalIssue(repoName, additionalIssueData);
             
             badgeData = getTimeString(currTime);
             responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
@@ -181,14 +182,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
 
             issueBody = `<p align="center">${overallBadge}\n</p>` + 
                         `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
-                        `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet, but be sure to check again next month!</h>`;
-                        // `<h3>\nResponded Issues: </h3>` + 
-                        // `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
-                        // `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
-                        // `<h3>\nUnresponded Issues:</h3>` + 
-                        // `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
-
-
+                        `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
         } else {
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
@@ -304,26 +298,27 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
             'prevData': prevData
         }
 
-        yield updateAdditionalInfo(octokit, repoName, additionalIssueData);
+        yield updateAdditionalInfo(repoName, additionalIssueData);
     });
 }
 
-// function updateAdditionalInfo(octokit, repoName, additionalIssueData) {
-//     return __awaiter(this, void 0, void 0, function* () {
-//         const date = new Date();
-//         var month = date.getMonth();
-//         if(month == 0) {
-//             month = 11;
-//         }
-        
-//     });
-// }
-
-function createAdditionalIssue(octokit, repoName, additionalIssueData) {
+function getExistingIssue(newOctokit, repoName) {
     return __awaiter(this, void 0, void 0, function* () {
+        var issues = yield getAllIssues(newOctokit, infoRepoOwner, infoRepoName, [], 1);
+        var issue;
+        for (var i = 0; i < issues.length; i++) {
+            issue = issues[i];
+            if(issue.title == repoName) {
+                return issue;
+            }
+        }
+        return null;
+    });
+}
 
+function updateAdditionalInfo(repoName, additionalIssueData) {
+    return __awaiter(this, void 0, void 0, function* () {
         const additionalToken  = core.getInput('additional-token');
-        // var newOctokit = new github.GitHub(additionalToken);
         var newOctokit = new Octokit({
             auth: additionalToken
         });
@@ -331,6 +326,42 @@ function createAdditionalIssue(octokit, repoName, additionalIssueData) {
         var month = date.getMonth();
         if(month == 0) {
             month = 11;
+        } else {
+            month -= 1;
+        }
+        var responseTimeStatus = additionalIssueData.responseTimeStatus;
+        var aveNumCommentsStatus = additionalIssueData.aveNumCommentsStatus;
+        var numUnrespondedStatus = additionalIssueData.numUnrespondedStatus;
+        var currData = additionalIssueData.currData;
+        var currTime = currData.aveResponseTime;
+        var additionalBody = `\n<h2>${month_name_map[month]}\n</h2>` + 
+                            `<h3>\nResponded Issues: </h3>` + 
+                            `<p>\nAverage response time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
+                            `<p>\nAverage number of comments per issue <b>(${aveNumCommentsStatus.toUpperCase()})</b>: ${currData.aveNumComments}</p>` + 
+                            `<h3>\nUnresponded Issues:</h3>` + 
+                            `<p>\nNumber of unresponded issues <b>(${numUnrespondedStatus.toUpperCase()})</b>: ${currData.unresponded}/${currData.total}</p>`;
+        var currIssue = yield getExistingIssue(newOctokit, repoName);
+        if(currIssue) {
+            console.log('issue title .... ' + currIssue.title);
+            var issueNumber = currIssue.number;
+            var issueBody = currIssue.body;
+        }
+    });
+}
+
+function createAdditionalIssue(repoName, additionalIssueData) {
+    return __awaiter(this, void 0, void 0, function* () {
+
+        const additionalToken  = core.getInput('additional-token');
+        var newOctokit = new Octokit({
+            auth: additionalToken
+        });
+        const date = new Date();
+        var month = date.getMonth();
+        if(month == 0) {
+            month = 11;
+        } else {
+            month -= 1;
         }
         const currData = additionalIssueData.currData;
         const currTime = currData.aveResponseTime;
