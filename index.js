@@ -583,6 +583,7 @@ function run () {
 
             var currDate = new Date();
             console.log('\noriginal currDate: ' + currDate);
+            currDate.setMonth(4);
             var currMonth = currDate.getMonth();
             var baseMonth = currMonth - 1;
             var baseYear = currDate.getYear();
