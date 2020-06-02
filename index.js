@@ -152,6 +152,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData) {
         //     aveResponseTime: [5, 47],
         //     aveNumComments: 2
         // }
+        prevData.total = 0;
         var prevTime = prevData.aveResponseTime;
         
         if (currData.total == 0) {
