@@ -323,7 +323,10 @@ function createAdditionalIssue(octokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
 
         const additionalToken  = core.getInput('additional-token');
-        var newOctokit = new github.GitHub(additionalToken);
+        // var newOctokit = new github.GitHub(additionalToken);
+        var newOctokit = new Octokit({
+            auth: additionalToken
+        });
         const date = new Date();
         var month = date.getMonth();
         if(month == 0) {
