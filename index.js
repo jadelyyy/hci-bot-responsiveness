@@ -568,8 +568,8 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
 function extractPulls(allIssues) {
     return __awaiter(this, void 0, void 0, function* () {
         var issue;
-        var issues;
-        var pulls;
+        var issues = [];
+        var pulls = [];
         for (var i = 0; i < allIssues.length; i++) {
             issue = allIssues[i];
             if (issue.pull_request) {
