@@ -599,7 +599,7 @@ function run () {
             var {pulls, issues} = yield extractPulls(allIssues);
 
             console.log('Total Number of Issues: ' + issues.length);
-            console.log('Total Number of Pulls' + pulls.length);
+            console.log('Total Number of Pulls: ' + pulls.length);
 
             var currDate = new Date();
             console.log('\noriginal currDate: ' + currDate);
