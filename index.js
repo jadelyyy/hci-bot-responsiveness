@@ -5,7 +5,6 @@ const infoRepoOwner = 'jadelyyy';
 const infoRepoName = 'responsiveness-info';
 
 const {badge_color_map, badge_name_map} = require("./badgeData.js");
-
 var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
 
 var month_name_map = {
@@ -566,6 +565,26 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
     });
 }
 
+function extractPulls(allIssues) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var issue;
+        var issues;
+        var pulls;
+        for (var i = 0; i < allIssues.length; i++) {
+            issue = allIssues[i];
+            if (issue.pull_request) {
+                pulls.push(issue);
+            } else {
+                issues.push(issue);
+            }
+        }
+        return {
+            pulls: pulls,
+            issues: issues
+        }
+    });
+}
+
 function run () {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -575,9 +594,12 @@ function run () {
 
             var octokit = new github.GitHub(userToken);
 
-            var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
+            var allIssues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
+
+            var {pulls, issues} = yield extractPulls(allIssues);
 
             console.log('Total Number of Issues: ' + issues.length);
+            console.log('Total Number of Pulls' + pulls.length);
 
             var currDate = new Date();
             console.log('\noriginal currDate: ' + currDate);
