@@ -480,18 +480,21 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
 
 function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
+        var comments;
         if (isPull) {
-            const {data: comments} = yield octokit.pulls.listComments({
+            const {data: listedComments} = yield octokit.pulls.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 pull_number: number
             });
+            comments = listedComments;
         } else {
-            const {data: comments} = yield octokit.issues.listComments({
+            const {data: listedComments} = yield octokit.issues.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 issue_number: number
             });
+            comments = listedComments;
         }
 
         // return immediately if issue has no comments
@@ -597,13 +600,11 @@ function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
             per_page: 100,
             page: pageNum
         });
-        console.log('first pull call: ' + pulls.length);
         var pullsLeft = true;
         if(pulls.length == 0) {
             pullsLeft = false;
         }
         if(pullsLeft) {
-            console.log('before pushing: ' + allPulls.length);
             for (var i = 0; i < pulls.length; i++) {
                 const {data: pull} = yield octokit.pulls.get({
                     owner: repoOwner,
@@ -612,7 +613,6 @@ function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
                 })
                 allPulls.push(pull);
             }
-            console.log('after pushing: ' + allPulls.length);
             return yield getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum + 1);
         } else {
             return allPulls;
