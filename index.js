@@ -574,20 +574,19 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
             issue = allIssues[i];
             if (issue.pull_request) {
                 console.log('pull request does exist');
-
                 const {data: pull} = octokit.pulls.get({
                     owner: repoOwner,
                     repo: repoName,
                     pull_number: issue.number
                 });
                 console.log('pull: ' + pull);
-                const {data: pull} = octokit.pulls.get({
+                const {data: pull2} = octokit.pulls.get({
                     owner: repoOwner,
                     repo: repoName,
                     pull_number: issue.number
                 });
-                console.log('pull: ' + pull);
-                pulls.push(pull);
+                console.log('pull: ' + pull2);
+                pulls.push(pull2);
             } else {
                 issues.push(issue);
             }
