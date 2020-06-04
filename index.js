@@ -569,44 +569,39 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
     return __awaiter(this, void 0, void 0, function* () {
         var issue;
         var issues = [];
-        // var pulls = [];
-        // for (var i = 0; i < allIssues.length; i++) {
-        //     issue = allIssues[i];
-        //     if (issue.pull_request) {
-        //         console.log('pull request does exist');
-        //         const {data: pull} = octokit.pulls.get({
-        //             owner: repoOwner,
-        //             repo: repoName,
-        //             pull_number: issue.number
-        //         });
-        //         console.log('pull: ' + pull);
-        //         const {data: pull2} = octokit.pulls.get({
-        //             owner: repoOwner,
-        //             repo: repoName,
-        //             pull_number: issue.number
-        //         });
-        //         console.log('pull: ' + pull2);
-        //         pulls.push(pull2);
-        //     } else {
-        //         issues.push(issue);
-        //     }
-        // }
-        // return {
-        //     pull: pulls,
-        //     issues: issues
-        // }
-        const {data: pulls} = yield octokit.pulls.list({
-            owner: repoOwner,
-            repo: repoName
-        });
-        console.log('after pulling...');
-        console.log('returned pulls: ' + pulls);
-        console.log('Total Number of Pulls: ' + pulls.length);
-        console.log('pull number: ' + pulls[0].number);
-        console.log('created_at: ' + pulls[0].created_at);
-        console.log('merged_at: ' + pulls[0].merged_at);
-        console.log('comments: ' + pulls[0].comments);
-        console.log('review_comments: ' + pulls[0].review_comments);
+        var pulls = [];
+        for (var i = 0; i < allIssues.length; i++) {
+            issue = allIssues[i];
+            if (issue.pull_request) {
+                console.log('pull request does exist');
+                const {data: pull} = yield octokit.pulls.get({
+                    owner: repoOwner,
+                    repo: repoName,
+                    pull_number: issue.number
+                });
+                console.log('pull: ' + pull);
+                console.log('pull number: ' + pull.number);
+                pulls.push(pull);
+            } else {
+                issues.push(issue);
+            }
+        }
+        return {
+            pull: pulls,
+            issues: issues
+        }
+        // const {data: pulls} = yield octokit.pulls.list({
+        //     owner: repoOwner,
+        //     repo: repoName
+        // });
+        // console.log('after pulling...');
+        // console.log('returned pulls: ' + pulls);
+        // console.log('Total Number of Pulls: ' + pulls.length);
+        // console.log('pull number: ' + pulls[0].number);
+        // console.log('created_at: ' + pulls[0].created_at);
+        // console.log('merged_at: ' + pulls[0].merged_at);
+        // console.log('comments: ' + pulls[0].comments);
+        // console.log('review_comments: ' + pulls[0].review_comments);
     });
 }
 
