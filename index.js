@@ -595,7 +595,7 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
         //     pull: pulls,
         //     issues: issues
         // }
-        const {data: pulls} = octokit.pulls.list({
+        const {data: pulls} = yield octokit.pulls.list({
             owner: repoOwner,
             repo: repoName
         });
