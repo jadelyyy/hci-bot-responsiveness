@@ -573,11 +573,20 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
         for (var i = 0; i < allIssues.length; i++) {
             issue = allIssues[i];
             if (issue.pull_request) {
+                console.log('pull request does exist');
+
                 const {data: pull} = octokit.pulls.get({
                     owner: repoOwner,
                     repo: repoName,
                     pull_number: issue.number
                 });
+                console.log('pull: ' + pull);
+                const {data: pull} = octokit.pulls.get({
+                    owner: repoOwner,
+                    repo: repoName,
+                    pull_number: issue.number
+                });
+                console.log('pull: ' + pull);
                 pulls.push(pull);
             } else {
                 issues.push(issue);
@@ -610,7 +619,7 @@ function run () {
             console.log('merged_at: ' + pulls[0].merged_at);
             console.log('comments: ' + pulls[0].comments);
             console.log('review_comments: ' + pulls[0].review_comments);
-            
+
             // get month duration
             var currDate = new Date();
             var currMonth = currDate.getMonth();
