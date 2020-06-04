@@ -638,7 +638,8 @@ function run () {
             // get month duration
             var currDate = new Date();
             var currMonth = currDate.getMonth();
-            var baseMonth = currMonth - 1;
+            // var baseMonth = currMonth - 1;
+            baseMonth = currMonth;
             var baseYear = currDate.getYear();
             if(baseMonth < 0) {
                 baseMonth = 11;
@@ -706,7 +707,7 @@ function run () {
             prevMonthPullsData.aveNumReviewComments = getAverageNumComments(prevMonthPullsData.numReviewComments);
 
 
-            yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData, currMonthPUllsData, prevMonthPullsData);
+            yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData, currMonthPullsData, prevMonthPullsData);
 
         } catch(err) {
             console.log(err);
