@@ -557,7 +557,16 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
             issuesLeft = false;
         }
         if(issuesLeft) {
-            allIssues.push(...issues);
+            var issue;
+            for(var i = 0; i < issues.length; i++) {
+                issue = issues[i];
+                if(issue.pull_request) {
+                    // allIssues.push(...issues);
+                    allIssues.push(issue);
+                } else {
+                    console.log('not adding pull request with number: ' + issue.number);
+                }
+            }
             return yield getAllIssues(octokit, repoOwner, repoName, allIssues, pageNum + 1);
         } else {
             return allIssues;
@@ -565,43 +574,32 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
     });
 }
 
-function extractPulls(octokit, repoOwner, repoName, allIssues) {
+function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
     return __awaiter(this, void 0, void 0, function* () {
-        var issue;
-        var issues = [];
-        var pulls = [];
-        for (var i = 0; i < allIssues.length; i++) {
-            issue = allIssues[i];
-            if (issue.pull_request) {
-                console.log('pull request does exist');
-                const {data: pull} = yield octokit.pulls.get({
-                    owner: repoOwner,
-                    repo: repoName,
-                    pull_number: issue.number
-                });
-                console.log('pull: ' + pull);
-                console.log('pull number: ' + pull.number);
-                pulls.push(pull);
-            } else {
-                issues.push(issue);
-            }
+        const {data: pulls} = yield octokit.pulls.list({
+            owner: repoOwner,
+            repo: repoName,
+            per_page: 100,
+            page: pageNum
+        });
+        var pullsLeft = true;
+        if(pulls.length = 0) {
+            pullsLeft = false;
         }
-        return {
-            pull: pulls,
-            issues: issues
+        if(pullsLeft) {
+            allPulls.push(...pulls);
+            return yield getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum + 1);
+        } else {
+            console.log('after pulling...');
+            console.log('returned pulls: ' + pulls);
+            console.log('Total Number of Pulls: ' + pulls.length);
+            console.log('pull number: ' + pulls[0].number);
+            console.log('created_at: ' + pulls[0].created_at);
+            console.log('merged_at: ' + pulls[0].merged_at);
+            console.log('comments: ' + pulls[0].comments);
+            console.log('review_comments: ' + pulls[0].review_comments);
+            return allPulls;
         }
-        // const {data: pulls} = yield octokit.pulls.list({
-        //     owner: repoOwner,
-        //     repo: repoName
-        // });
-        // console.log('after pulling...');
-        // console.log('returned pulls: ' + pulls);
-        // console.log('Total Number of Pulls: ' + pulls.length);
-        // console.log('pull number: ' + pulls[0].number);
-        // console.log('created_at: ' + pulls[0].created_at);
-        // console.log('merged_at: ' + pulls[0].merged_at);
-        // console.log('comments: ' + pulls[0].comments);
-        // console.log('review_comments: ' + pulls[0].review_comments);
     });
 }
 
@@ -614,12 +612,13 @@ function run () {
 
             var octokit = new github.GitHub(userToken);
 
-            var allIssues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
+            var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
-            console.log('Total Number of Issues: ' + allIssues.length);
+            console.log('Total Number of Issues: ' + issues.length);
 
-            var {pulls, issues} = yield extractPulls(octokit, repoOwner, repoName, allIssues);
+            var pulls = yield getAllPulls(octokit, repoOwner, repoName, [], 1);
 
+            console.log('\n\n\nout of function...');
             console.log('Total Number of Pulls: ' + pulls.length);
 
             console.log('created_at: ' + pulls[0].created_at);
