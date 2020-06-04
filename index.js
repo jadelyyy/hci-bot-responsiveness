@@ -569,7 +569,7 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
     return __awaiter(this, void 0, void 0, function* () {
         var issue;
         var issues = [];
-        var pulls = [];
+        // var pulls = [];
         // for (var i = 0; i < allIssues.length; i++) {
         //     issue = allIssues[i];
         //     if (issue.pull_request) {
