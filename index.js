@@ -600,6 +600,7 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
             repo: repoName
         });
         console.log('after pulling...');
+        console.log('returned pulls: ' + pulls);
         console.log('Total Number of Pulls: ' + pulls.length);
         console.log('pull number: ' + pulls[0].number);
         console.log('created_at: ' + pulls[0].created_at);
@@ -620,9 +621,10 @@ function run () {
 
             var allIssues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
+            console.log('Total Number of Issues: ' + issues.length);
+
             var {pulls, issues} = yield extractPulls(octokit, repoOwner, repoName, allIssues);
 
-            console.log('Total Number of Issues: ' + issues.length);
             console.log('Total Number of Pulls: ' + pulls.length);
 
             console.log('created_at: ' + pulls[0].created_at);
