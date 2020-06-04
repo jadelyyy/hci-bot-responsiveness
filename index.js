@@ -599,6 +599,13 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
             owner: repoOwner,
             repo: repoName
         });
+        console.log('after pulling...');
+        console.log('Total Number of Pulls: ' + pulls.length);
+        console.log('pull number: ' + pulls[0].number);
+        console.log('created_at: ' + pulls[0].created_at);
+        console.log('merged_at: ' + pulls[0].merged_at);
+        console.log('comments: ' + pulls[0].comments);
+        console.log('review_comments: ' + pulls[0].review_comments);
     });
 }
 
