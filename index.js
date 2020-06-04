@@ -137,7 +137,7 @@ function getCommentsString(numComments) {
     return commentsString;
 }
 
-function createIssue(octokit, repoOwner, repoName, currData, prevData) {
+function createIssue(octokit, repoOwner, repoName, currData, prevData, currPullsData, prevPullsData) {
     return __awaiter(this, void 0, void 0, function* () {
         const additionalToken  = core.getInput('additional-token');
         var newOctokit = new Octokit({
@@ -478,13 +478,21 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
     }
 }
 
-function getCommentsData(octokit, repoOwner, repoName, issueNumber) {
+function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
-        const {data: comments} = yield octokit.issues.listComments({
-            owner: repoOwner,
-            repo: repoName,
-            issue_number: issueNumber
-        });
+        if (isPull) {
+            const {data: comments} = yield octokit.pulls.listComments({
+                owner: repoOwner,
+                repo: repoName,
+                pull_number: number
+            });
+        } else {
+            const {data: comments} = yield octokit.issues.listComments({
+                owner: repoOwner,
+                repo: repoName,
+                issue_number: number
+            });
+        }
 
         // return immediately if issue has no comments
         if(comments.length == 0) {
@@ -507,11 +515,12 @@ function getCommentsData(octokit, repoOwner, repoName, issueNumber) {
     });
 }
 
-function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear) {
+function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             var firstResponseTimes = [];
-            var numComments = []
+            var numComments = [];
+            var numReviewComments = [];
             var commentsData;
             var issue, issueNumber, issueCreationDate;
             var total = 0;
@@ -524,20 +533,27 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear) {
                     continue;
                 }
                 total += 1;
-                commentsData = yield getCommentsData(octokit, repoOwner, repoName, issueNumber);
+                commentsData = yield getCommentsData(octokit, repoOwner, repoName, issueNumber, isPull);
                 if(commentsData) {
                     firstResponseTimes.push(getDifference(issueCreationDate, commentsData.firstResponseDate));
                     numComments.push(commentsData.totalComments);
                 } else {
                     unresponded += 1;
                 }
+                if(isPull) {
+                    numReviewComments.push(issue.review_comments);
+                }
             }
-            return {
+            var allData = {
                 firstResponseTimes: firstResponseTimes,
                 total: total,
                 unresponded: unresponded,
                 numComments: numComments
             }
+            if(isPull) {
+                allData.numReviewComments = numReviewComments;
+            }
+            return allData;
         } catch(err) {
             console.log(err);
         }
@@ -588,7 +604,14 @@ function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
         }
         if(pullsLeft) {
             console.log('before pushing: ' + allPulls.length);
-            allPulls.push(...pulls);
+            for (var i = 0; i < pulls.length; i++) {
+                const {data: pull} = yield octokit.pulls.get({
+                    owner: repoOwner,
+                    repo: repoName,
+                    pull_number: pulls[i].number
+                })
+                allPulls.push(pull);
+            }
             console.log('after pushing: ' + allPulls.length);
             return yield getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum + 1);
         } else {
@@ -612,14 +635,6 @@ function run () {
 
             var pulls = yield getAllPulls(octokit, repoOwner, repoName, [], 1);
 
-            console.log('\n\n\nout of function...');
-            console.log('Total Number of Pulls: ' + pulls.length);
-
-            console.log('created_at: ' + pulls[0].created_at);
-            console.log('merged_at: ' + pulls[0].merged_at);
-            console.log('comments: ' + pulls[0].comments);
-            console.log('review_comments: ' + pulls[0].review_comments);
-
             // get month duration
             var currDate = new Date();
             var currMonth = currDate.getMonth();
@@ -633,7 +648,7 @@ function run () {
             // get issue data
             console.log("baseMonth: " + baseMonth);
             console.log("baseYear: " + baseYear);
-            var currMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
+            var currMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, false);
             var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
             console.log('currMonthResponseTimes Array: ' + currMonthIssuesData.firstResponseTimes);
             console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
@@ -644,6 +659,20 @@ function run () {
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
             currMonthIssuesData.aveNumComments = getAverageNumComments(currMonthIssuesData.numComments);
 
+
+            var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
+            var currMonthPullsAveResponseTime = getAverageTime(currMonthPullsData.firstResponseTimes);
+            console.log('currMonthPullsResponseTimes Array: ' + currMonthPullsData.firstResponseTimes);
+            console.log('number of currMonthPullsResponseTimes: ' + currMonthPullsData.firstResponseTimes.length);
+            console.log(`${currMonthPullsData.unresponded}/${currMonthPullsData.total} unresponded`);
+            console.log('numComments: ' + currMonthPullsData.numComments);
+            console.log('numReviewComments: ' + currMonthPullsData.numReviewComments);
+
+            currMonthPullsData.aveResponseTime = currMonthPullsAveResponseTime;
+            currMonthPullsData.aveNumComments = getAverageNumComments(currMonthPullsData.numComments);
+            currMonthPullsData.aveNumReviewComments = getAverageNumComments(currMonthPullsData.numReviewComments);
+
+
             // get prev month duration
             baseMonth -= 1;
             if(baseMonth < 0) {
@@ -653,7 +682,7 @@ function run () {
             console.log("new baseMonth: " + baseMonth);
             console.log("new baseYear: " + baseYear);
 
-            var prevMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
+            var prevMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, false);
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
             console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
             console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
@@ -664,7 +693,20 @@ function run () {
             prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
             prevMonthIssuesData.aveNumComments = getAverageNumComments(prevMonthIssuesData.numComments);
 
-            yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData);
+            var prevMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
+            var prevMonthPullsAveResponseTime = getAverageTime(prevMonthPullsData.firstResponseTimes);
+            console.log('prevMonthPullsResponseTimes Array: ' + prevMonthPullsData.firstResponseTimes);
+            console.log('number of prevMonthPullsResponseTimes: ' + prevMonthPullsData.firstResponseTimes.length);
+            console.log(`${prevMonthPullsData.unresponded}/${prevMonthPullsData.total} unresponded`);
+            console.log('numComments: ' + prevMonthPullsData.numComments);
+            console.log('numReviewComments: ' + prevMonthPullsData.numReviewComments);
+
+            prevMonthPullsData.aveResponseTime = prevMonthPullsAveResponseTime;
+            prevMonthPullsData.aveNumComments = getAverageNumComments(prevMonthPullsData.numComments);
+            prevMonthPullsData.aveNumReviewComments = getAverageNumComments(prevMonthPullsData.numReviewComments);
+
+
+            yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData, currMonthPUllsData, prevMonthPullsData);
 
         } catch(err) {
             console.log(err);
