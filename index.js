@@ -570,31 +570,35 @@ function extractPulls(octokit, repoOwner, repoName, allIssues) {
         var issue;
         var issues = [];
         var pulls = [];
-        for (var i = 0; i < allIssues.length; i++) {
-            issue = allIssues[i];
-            if (issue.pull_request) {
-                console.log('pull request does exist');
-                const {data: pull} = octokit.pulls.get({
-                    owner: repoOwner,
-                    repo: repoName,
-                    pull_number: issue.number
-                });
-                console.log('pull: ' + pull);
-                const {data: pull2} = octokit.pulls.get({
-                    owner: repoOwner,
-                    repo: repoName,
-                    pull_number: issue.number
-                });
-                console.log('pull: ' + pull2);
-                pulls.push(pull2);
-            } else {
-                issues.push(issue);
-            }
-        }
-        return {
-            pull: pulls,
-            issues: issues
-        }
+        // for (var i = 0; i < allIssues.length; i++) {
+        //     issue = allIssues[i];
+        //     if (issue.pull_request) {
+        //         console.log('pull request does exist');
+        //         const {data: pull} = octokit.pulls.get({
+        //             owner: repoOwner,
+        //             repo: repoName,
+        //             pull_number: issue.number
+        //         });
+        //         console.log('pull: ' + pull);
+        //         const {data: pull2} = octokit.pulls.get({
+        //             owner: repoOwner,
+        //             repo: repoName,
+        //             pull_number: issue.number
+        //         });
+        //         console.log('pull: ' + pull2);
+        //         pulls.push(pull2);
+        //     } else {
+        //         issues.push(issue);
+        //     }
+        // }
+        // return {
+        //     pull: pulls,
+        //     issues: issues
+        // }
+        const {data: pulls} = octokit.pulls.list({
+            owner: repoOwner,
+            repo: repoName
+        });
     });
 }
 
