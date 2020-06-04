@@ -621,7 +621,7 @@ function run () {
 
             var allIssues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
-            console.log('Total Number of Issues: ' + issues.length);
+            console.log('Total Number of Issues: ' + allIssues.length);
 
             var {pulls, issues} = yield extractPulls(octokit, repoOwner, repoName, allIssues);
 
