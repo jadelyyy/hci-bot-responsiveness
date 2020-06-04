@@ -583,7 +583,7 @@ function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
             page: pageNum
         });
         var pullsLeft = true;
-        if(pulls.length = 0) {
+        if(pulls.length == 0) {
             pullsLeft = false;
         }
         if(pullsLeft) {
