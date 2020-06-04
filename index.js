@@ -560,8 +560,7 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
             var issue;
             for(var i = 0; i < issues.length; i++) {
                 issue = issues[i];
-                if(issue.pull_request) {
-                    // allIssues.push(...issues);
+                if(!issue.pull_request) {
                     allIssues.push(issue);
                 } else {
                     console.log('not adding pull request with number: ' + issue.number);
@@ -582,6 +581,7 @@ function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
             per_page: 100,
             page: pageNum
         });
+        console.log('first pull call: ' + pulls.length);
         var pullsLeft = true;
         if(pulls.length == 0) {
             pullsLeft = false;
