@@ -587,17 +587,11 @@ function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
             pullsLeft = false;
         }
         if(pullsLeft) {
+            console.log('before pushing: ' + allPulls.length);
             allPulls.push(...pulls);
+            console.log('after pushing: ' + allPulls.length);
             return yield getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum + 1);
         } else {
-            console.log('after pulling...');
-            console.log('returned pulls: ' + pulls);
-            console.log('Total Number of Pulls: ' + pulls.length);
-            console.log('pull number: ' + pulls[0].number);
-            console.log('created_at: ' + pulls[0].created_at);
-            console.log('merged_at: ' + pulls[0].merged_at);
-            console.log('comments: ' + pulls[0].comments);
-            console.log('review_comments: ' + pulls[0].review_comments);
             return allPulls;
         }
     });
