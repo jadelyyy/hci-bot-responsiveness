@@ -507,7 +507,7 @@ function getCommentsData(octokit, repoOwner, repoName, issueNumber) {
     });
 }
 
-function getIssuesData(octokit, repoOwner, repoName, issues, baseMonth, baseYear) {
+function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             var firstResponseTimes = [];
@@ -565,7 +565,7 @@ function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
     });
 }
 
-function extractPulls(allIssues) {
+function extractPulls(octokit, repoOwner, repoName, allIssues) {
     return __awaiter(this, void 0, void 0, function* () {
         var issue;
         var issues = [];
@@ -573,13 +573,18 @@ function extractPulls(allIssues) {
         for (var i = 0; i < allIssues.length; i++) {
             issue = allIssues[i];
             if (issue.pull_request) {
-                pulls.push(issue);
+                const {data: pull} = octokit.pulls.get({
+                    owner: repoOwner,
+                    repo: repoName,
+                    pull_number: issue.number
+                });
+                pulls.push(pull);
             } else {
                 issues.push(issue);
             }
         }
         return {
-            pulls: pulls,
+            pull: pulls,
             issues: issues
         }
     });
@@ -596,13 +601,18 @@ function run () {
 
             var allIssues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
-            var {pulls, issues} = yield extractPulls(allIssues);
+            var {pulls, issues} = yield extractPulls(octokit, repoOwner, repoName, allIssues);
 
             console.log('Total Number of Issues: ' + issues.length);
             console.log('Total Number of Pulls: ' + pulls.length);
 
+            console.log('created_at: ' + pulls[0].created_at);
+            console.log('merged_at: ' + pulls[0].merged_at);
+            console.log('comments: ' + pulls[0].comments);
+            console.log('review_comments: ' + pulls[0].review_comments);
+            
+            // get month duration
             var currDate = new Date();
-            console.log('\noriginal currDate: ' + currDate);
             var currMonth = currDate.getMonth();
             var baseMonth = currMonth - 1;
             var baseYear = currDate.getYear();
@@ -611,9 +621,10 @@ function run () {
                 baseYear -= 1;
             }
 
+            // get issue data
             console.log("baseMonth: " + baseMonth);
             console.log("baseYear: " + baseYear);
-            var currMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
+            var currMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
             var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
             console.log('currMonthResponseTimes Array: ' + currMonthIssuesData.firstResponseTimes);
             console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
@@ -624,6 +635,7 @@ function run () {
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
             currMonthIssuesData.aveNumComments = getAverageNumComments(currMonthIssuesData.numComments);
 
+            // get prev month duration
             baseMonth -= 1;
             if(baseMonth < 0) {
                 baseMonth = 11;
@@ -632,7 +644,7 @@ function run () {
             console.log("new baseMonth: " + baseMonth);
             console.log("new baseYear: " + baseYear);
 
-            var prevMonthIssuesData = yield getIssuesData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
+            var prevMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear);
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
             console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
             console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
