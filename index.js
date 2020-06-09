@@ -144,8 +144,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             auth: additionalToken
         });
         var issueBody;
-        var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge, overallBadge;
-        var responseTimeStatus, numUnrespondedStatus, aveNumCommentsStatus, overallStatus;
+        var responseTimeBadge, numUnrespondedBadge, overallBadge;
+        var responseTimeStatus, numUnrespondedStatus, overallStatus;
         var badgeData;
         var currTime = currData.aveResponseTime;
         // prevData = {
@@ -174,30 +174,24 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             numUnrespondedBadge = createBadgeWithData('unresponded', 'no issues', badgeData);
 
-            badgeData = getCommentsString(currData.aveNumComments);
-            aveNumCommentsBadge = createBadgeWithData('ave_comments', 'no issues', badgeData);
-
             overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
 
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('\nnumUnrespondedBadge: ' + numUnrespondedBadge);
-            console.log('\naveNumCommentsBadge: ' + aveNumCommentsBadge);
 
             issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                        `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
+                        `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                         `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
         } else {
             var changes = [];
             var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
-            var numCommentsDifference = currData.aveNumComments - prevData.aveNumComments;
             var overallChange, initMessage;
             var overallChangeString;
 
             console.log("\n\n\n\n");
             console.log('timeDifference: ' + timeDifference);
             console.log('unrespondedDifference: ' + unrespondedDifference);
-            console.log('numCommentsDifference: ' + numCommentsDifference);
 
             // response time decreased
             if(timeDifference > 0) {
@@ -229,21 +223,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
                 changes.push(1)
                 numUnrespondedStatus = 'decreased';
             }
-            // more comments this month
-            if(numCommentsDifference > 0) {
-                changes.push(1);
-                aveNumCommentsStatus = 'increased';
-            }
-            // same comments
-            if(numCommentsDifference == 0) {
-                changes.push(0);
-                aveNumCommentsStatus = 'same';
-            }
-            // less comments this month
-            if(numCommentsDifference < 0) {
-                changes.push(-1);
-                aveNumCommentsStatus = 'decreased';
-            }
 
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
@@ -268,14 +247,10 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             numUnrespondedBadge = createBadgeWithData('unresponded', numUnrespondedStatus, badgeData);
 
-            badgeData = getCommentsString(currData.aveNumComments);
-            aveNumCommentsBadge = createBadgeWithData('ave_comments', aveNumCommentsStatus, badgeData);
-
             overallBadge = createBadge('overall', overallStatus, 'for-the-badge');
 
             const additionalIssueData = {
                 'responseTimeStatus': responseTimeStatus,
-                'aveNumCommentsStatus': aveNumCommentsStatus,
                 'numUnrespondedStatus': numUnrespondedStatus,
                 'currData': currData,
                 'prevData': prevData
@@ -288,9 +263,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             console.log('overallBadge: ' + overallBadge);
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
-            console.log('aveNumCommentsBadge: ' + aveNumCommentsBadge);
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                            `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}&nbsp;&nbsp;&nbsp;&nbsp;${aveNumCommentsBadge}\n</p>` + 
+                            `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.\n</h2>` + 
                             `<p>For more information on your repository's progress, visit <a href="${additionalInfoIssue.html_url}">${repoName}'s Additional Responsiveness Info</a></p>`
         }
@@ -327,14 +301,12 @@ function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
             issueMonth = 11;
         }
         var responseTimeStatus = additionalIssueData.responseTimeStatus;
-        var aveNumCommentsStatus = additionalIssueData.aveNumCommentsStatus;
         var numUnrespondedStatus = additionalIssueData.numUnrespondedStatus;
         var currData = additionalIssueData.currData;
         var currTime = currData.aveResponseTime;
         var commentBody = `\n<h2>${month_name_map[issueMonth]}\n</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\nAverage response time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
-                            `<p>\nAverage number of comments per issue <b>(${aveNumCommentsStatus.toUpperCase()})</b>: ${currData.aveNumComments}</p>` + 
                             `<h3>\nUnresponded Issues:</h3>` + 
                             `<p>\nNumber of unresponded issues <b>(${numUnrespondedStatus.toUpperCase()})</b>: ${currData.unresponded}/${currData.total}</p>`;
         var currIssue = yield getExistingIssue(newOctokit, repoName);
@@ -365,7 +337,6 @@ function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
                         `<h2>${month_name_map[issueMonth]}\n</h2>` + 
                         `<h3>\nResponded Issues: </h3>` + 
                         `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
-                        `<p>\n    Average number of comments per issue: ${currData.aveNumComments}</p>` + 
                         `<h3>\nUnresponded Issues:</h3>` + 
                         `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
 
@@ -375,60 +346,6 @@ function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
             owner: infoRepoOwner,
             repo: infoRepoName,
             title: repoName,
-            body: issueBody
-        });
-    });
-}
-
-function createIssue2(octokit, repoOwner, repoName, currData, prevData) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var issueBody;
-        var responseTimeBadge, numUnrespondedBadge, aveNumCommentsBadge;
-        var currTime = currData.aveResponseTime;
-        var prevTime = [5, 47]; 
-
-        if (currTime == null) {
-            issueBody = `There were no issues created this month.`;
-        } else if (prevTime == null) {
-            responseTimeBadge = createBadge('response_time', 'no_issues');
-            numUnrespondedBadge = createBadge('unresponded', 'no_issues');
-            aveNumCommentsBadge = createBadge('comments', 'no_issues');
-            issueBody = `${responseTimeBadge}${numUnrespondedBadge}${aveNumCommentsBadge}\nGreat job! At an average of ${currTime[0]} hours and ${currTime[1]} minutes this month, ` + 
-                        `your repository's response time was better than 70% of the communities on Github!`;
-        } else {
-            var difference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
-            var percentDifference = (Math.floor(Math.abs(difference)/(prevTime[0] * 60 + prevTime[1]) * 100)).toString() + '%';
-            var change, initMessage;
-            // response time decreased
-            if(difference > 0) {
-                change = 'increased';
-                initMessage = '';
-            }
-            if(difference == 0) {
-                change = 'been maintained the same';
-                initMessage = 'Not bad! ';
-                percentDifference = '';
-            }
-            if(difference < 0) {
-                change = 'decreased';
-                initMessage = 'Great job! '
-            }
-            responseTimeBadge = createBadge('response time', 'no_issues');
-            numUnrespondedBadge = createBadge('unresponded', 'no_issues');
-            aveNumCommentsBadge = createBadge('comments', 'no_issues');
-            var issueBody = `${badgeImage}\n${initMessage}This month, your repository's average response time has ${change} ${percentDifference} since last month. ` + 
-                            // `At an average of ${currTime[0]} hours and ${currTime[1]} minutes, your response time was better than 70% of the communities on Github!`;
-                            `This month, your repository's metrics are: \n` +
-                            `\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes` + 
-                            `\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}` + 
-                            `\n    Average number of comments per issue: ${currData.aveNumComments}`;
-        }
-        // issueBody = `Great job! At an average of ${currTime} hours this month, ` + 
-        //             `your repository's response time was better than 70% of the communities on Github!`;
-        const {data: issue} = yield octokit.issues.create({
-            owner: repoOwner,
-            repo: repoName,
-            title: 'Monthly Responsiveness Update',
             body: issueBody
         });
     });
@@ -655,10 +572,8 @@ function run () {
             console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
             console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
             console.log(`${currMonthIssuesData.unresponded}/${currMonthIssuesData.total} unresponded`);
-            console.log('numComments: ' + currMonthIssuesData.numComments);
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
-            currMonthIssuesData.aveNumComments = getAverageNumComments(currMonthIssuesData.numComments);
 
 
             var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
@@ -666,12 +581,9 @@ function run () {
             console.log('currMonthPullsResponseTimes Array: ' + currMonthPullsData.firstResponseTimes);
             console.log('number of currMonthPullsResponseTimes: ' + currMonthPullsData.firstResponseTimes.length);
             console.log(`${currMonthPullsData.unresponded}/${currMonthPullsData.total} unresponded`);
-            console.log('numComments: ' + currMonthPullsData.numComments);
             console.log('numReviewComments: ' + currMonthPullsData.numReviewComments);
 
             currMonthPullsData.aveResponseTime = currMonthPullsAveResponseTime;
-            currMonthPullsData.aveNumComments = getAverageNumComments(currMonthPullsData.numComments);
-            currMonthPullsData.aveNumReviewComments = getAverageNumComments(currMonthPullsData.numReviewComments);
 
 
             // get prev month duration
@@ -692,7 +604,6 @@ function run () {
             console.log('numComments: ' + prevMonthIssuesData.numComments);
 
             prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
-            prevMonthIssuesData.aveNumComments = getAverageNumComments(prevMonthIssuesData.numComments);
 
             var prevMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
             var prevMonthPullsAveResponseTime = getAverageTime(prevMonthPullsData.firstResponseTimes);
@@ -703,9 +614,6 @@ function run () {
             console.log('numReviewComments: ' + prevMonthPullsData.numReviewComments);
 
             prevMonthPullsData.aveResponseTime = prevMonthPullsAveResponseTime;
-            prevMonthPullsData.aveNumComments = getAverageNumComments(prevMonthPullsData.numComments);
-            prevMonthPullsData.aveNumReviewComments = getAverageNumComments(prevMonthPullsData.numReviewComments);
-
 
             yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData, currMonthPullsData, prevMonthPullsData);
 
