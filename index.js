@@ -525,7 +525,7 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                         console.log('pushing a collab date...');
                         firstCollabResponseTimes.push(getDifference(issueCreationDate, commentsData.firstCollabResponseDate));
                     }
-                    if(commentsData.firstContribResponseTimes) {
+                    if(commentsData.firstContribResponseDate) {
                         console.log('pushing a contrib date...');
                         firstContribResponseTimes.push(getDifference(issueCreationDate, commentsData.firstContribResponseDate));
                     }
