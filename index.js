@@ -427,11 +427,13 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
         if(comments.length == 0) {
             return null;
         } else {
-            var commentCreationDate;
+            var comment, commentCreationDate;
             var earliestCreationDate = new Date(comments[0].created_at);
             var collabEarliestCreationDate, contribEarliestCreationDate;
             for (var i = 0; i < comments.length; i++) {
-                commentCreationDate = new Date(comments[i].created_at);
+                comments = comments[i];
+                commentCreationDate = new Date(comment.created_at);
+
                 if(commentCreationDate.getTime() < earliestCreationDate.getTime()) {
                     earliestCreationDate = commentCreationDate;
                 }
@@ -455,9 +457,11 @@ function getUserData(octokit, repoOwner, repoName) {
             owner: repoOwner,
             repo: repoName
         });
+        console.log('collaborators: ' + collaborators[0].login);
         var collaboratorsSet = new Set(collaborators);
         console.log('collaboratorsSet: ' + collaboratorsSet.size);
         var contributorsSet = new Set(contributors);
+        console.log('contributors: ' + contributors[0].login)
         console.log('contributorsSet: ' + contributorsSet.size);
         return {
             collaborators: collaboratorsSet,
