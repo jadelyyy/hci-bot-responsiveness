@@ -397,26 +397,35 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
     }
 }
 
-function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
+function listComments(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
-        var comments;
         if (isPull) {
+            console.log("isPull=true");
             const {data: listedComments} = yield octokit.pulls.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 pull_number: number
             });
-            comments = listedComments;
+            return listedComments;
+            console.log('comments.length in if statement: ' + comments.length);
         } else {
+            console.log('isPull=false');
             const {data: listedComments} = yield octokit.issues.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 issue_number: number
             });
-            comments = listedComments;
+            return listedComments
+            console.log('comments.length in if statement: ' + comments.length);
         }
+    });
+}
 
+function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var comments = yield listComments(octokit, repoOwner, repoName, number, isPull);
         // return immediately if issue has no comments
+        console.log('returnedComments: ' + comments.length);
         if(comments.length == 0) {
             return null;
         } else {
