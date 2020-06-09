@@ -137,6 +137,29 @@ function getCommentsString(numComments) {
     return commentsString;
 }
 
+function getResponseTimeStatus(timeDifference, changes) {
+    var responseTimeStatus;
+    if(timeDifference > 0) {
+        changes.push(-1);
+        timeStatus = 'slower';
+    }
+    // response stayed the same
+    if(timeDifference == 0) {
+        changes.push(0);
+        timeStatus = 'same';
+    }
+    // response time increased
+    if(timeDifference < 0) {
+        changes.push(1);
+        timeStatus = 'faster';
+    }
+    return responseTimeStatus;
+}
+
+function calculateTimeDifference(currTime, prevTime) {
+    return (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
+}
+
 function createIssue(octokit, repoOwner, repoName, currData, prevData, currPullsData, prevPullsData) {
     return __awaiter(this, void 0, void 0, function* () {
         const additionalToken  = core.getInput('additional-token');
@@ -144,10 +167,12 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             auth: additionalToken
         });
         var issueBody;
-        var responseTimeBadge, numUnrespondedBadge, overallBadge;
-        var responseTimeStatus, numUnrespondedStatus, overallStatus;
+        var responseTimeBadge, collabResponseTimeBadge, contribResponseTimeBadge, numUnrespondedBadge, overallBadge;
+        var responseTimeStatus, collabResponseTimeStatus, contribResponseTimeStatus, numUnrespondedStatus, overallStatus;
         var badgeData;
         var currTime = currData.aveResponseTime;
+        var currCollabTime = currData.collabAveReponseTime;
+        var currContribTime = currData.contribAveResponseTime;
         // prevData = {
         //     firstResponseTimes: [0],
         //     total: 40,
@@ -158,6 +183,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         // }
         // prevData.total = 0;
         var prevTime = prevData.aveResponseTime;
+        var prevCollabTime = prevData.collabAveReponseTime;
+        var prevContribTime = prevData.contribAveResponseTime;
         
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
@@ -171,6 +198,15 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             badgeData = getTimeString(currTime);
             responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
 
+            badgeData = getTimeString(currCollabTime);
+            collabResponseTimeBadge = createBadgeWithData('collab_response_time', 'no issues', badgeData);
+
+            badgeData = getTimeString(currContribTime);
+            contribResponseTimeBadge = createBadgeWithData('contrib_response_time', 'no issues', badgeData);
+
+            badgeData = getTimeString(currTime);
+            responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
+
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             numUnrespondedBadge = createBadgeWithData('unresponded', 'no issues', badgeData);
 
@@ -180,13 +216,15 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             console.log('\nnumUnrespondedBadge: ' + numUnrespondedBadge);
 
             issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                        `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
+                        `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                         `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
         } else {
             console.log('currTime: ' + currTime);
             console.log('prevTime: ' + prevTime);
             var changes = [];
-            var timeDifference  = (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
+            var timeDifference  = calculateTimeDifference(currTime, prevTime);
+            var collabTimeDifference = calculateTimeDifference(currCollabTime, prevCollabTime);
+            var contribTimeDifference = calculateTimeDifference(currContribTime, prevContribTime);
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
             var overallChange, initMessage;
             var overallChangeString;
@@ -195,21 +233,24 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             console.log('timeDifference: ' + timeDifference);
             console.log('unrespondedDifference: ' + unrespondedDifference);
 
-            // response time decreased
-            if(timeDifference > 0) {
-                changes.push(-1);
-                responseTimeStatus = 'slower';
-            }
-            // response stayed the same
-            if(timeDifference == 0) {
-                changes.push(0);
-                responseTimeStatus = 'same';
-            }
-            // response time increased
-            if(timeDifference < 0) {
-                changes.push(1);
-                responseTimeStatus = 'faster';
-            }
+            responseTimeStatus = getResponseTimeStatus(timeDifference, changes);
+            collabResponseTimeStatus= getResponseTimeStatus(collabTimeDifference, changes);
+            contribResponseTimeBadge = getResponseTimeStatus(contribTimeDifference, changes);
+            // // response time decreased
+            // if(timeDifference > 0) {
+            //     changes.push(-1);
+            //     responseTimeStatus = 'slower';
+            // }
+            // // response stayed the same
+            // if(timeDifference == 0) {
+            //     changes.push(0);
+            //     responseTimeStatus = 'same';
+            // }
+            // // response time increased
+            // if(timeDifference < 0) {
+            //     changes.push(1);
+            //     responseTimeStatus = 'faster';
+            // }
             // more responded previous month
             if(unrespondedDifference > 0) {
                 changes.push(-1)
@@ -246,6 +287,12 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             badgeData = getTimeString(currTime);
             responseTimeBadge = createBadgeWithData('response_time', responseTimeStatus, badgeData);
 
+            badgeData = getTimeString(currCollabTime);
+            collabResponseTimeBadge = createBadgeWithData('collab_response_time', collabResponseTimeStatus, badgeData);
+
+            badgeData = getTimeString(currContribTime);
+            contribResponseTimeBadge = createBadgeWithData('contrib_response_time', contribResponseTimeStatus, badgeData);
+
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             numUnrespondedBadge = createBadgeWithData('unresponded', numUnrespondedStatus, badgeData);
 
@@ -253,6 +300,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
 
             const additionalIssueData = {
                 'responseTimeStatus': responseTimeStatus,
+                'collabResponseTimeStatus': collabResponseTimeStatus,
+                'contribResponseTimeStatus': contribResponseTimeStatus,
                 'numUnrespondedStatus': numUnrespondedStatus,
                 'currData': currData,
                 'prevData': prevData
@@ -266,7 +315,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             console.log('responseTimeBadge: ' + responseTimeBadge);
             console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                            `<p align="center">${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
+                            `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.\n</h2>` + 
                             `<p>For more information on your repository's progress, visit <a href="${additionalInfoIssue.html_url}">${repoName}'s Additional Responsiveness Info</a></p>`
         }
@@ -679,13 +728,22 @@ function run () {
 
             var prevMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, false);
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
+            var prevMonthCollabAveResponseTime = getAverageTime(prevMonthIssuesData.firstCollabResponseTimes);
+            var prevMonthContribAveResponseTime = getAverageTime(prevMonthIssuesData.firstContribResponseTimes);
             console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
             console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
             console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
+            console.log('');
+            console.log('number of prevMonthCollabResponeTimes: ' + prevMonthIssuesData.firstCollabResponseTimes.length);
+            console.log('prevMonthCollabAveResponseTime: ' + prevMonthCollabAveResponseTime);
+            console.log('number of prevMonthContribResponeTimes: ' + prevMonthIssuesData.firstContribResponseTimes.length);
+            console.log('prevMonthContribAveResponseTime: ' + prevMonthContribAveResponseTime);
             console.log(`${prevMonthIssuesData.unresponded}/${prevMonthIssuesData.total} unresponded`);
             console.log('numComments: ' + prevMonthIssuesData.numComments);
 
             prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
+            prevMonthIssuesData.collabAveResponseTime = prevMonthCollabAveResponseTime;
+            prevMonthIssuesData.contribAveResponseTime = prevMonthContribAveResponseTime;
 
             var prevMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
             var prevMonthPullsAveResponseTime = getAverageTime(prevMonthPullsData.firstResponseTimes);

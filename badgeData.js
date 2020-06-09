@@ -20,13 +20,17 @@ var overall_map = {
 
 var badge_color_map = {
     'response_time': response_map,
+    'collab_response_time': response_map,
+    'contrib_respone_time': response_map,
     'unresponded': unresponded_map,
     'ave_comments': ave_comments_map,
     'overall': overall_map
 };
 
 var badge_name_map = {
-    'response_time': 'response%20time',
+    'response_time': 'general%20response%20time',
+    'collab_response_time': 'collab%20response%20time',
+    'contrib_response_time': 'collab%20&%20contrib%20response%20time',
     'unresponded': 'num%20unresponded',
     'ave_comments': 'num%20comments',
     'overall': 'responsiveness'
