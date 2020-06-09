@@ -415,8 +415,8 @@ function listComments(octokit, repoOwner, repoName, number, isPull) {
                 repo: repoName,
                 issue_number: number
             });
-            console.log('comments.length in if statement: ' + comments.length);
-            return listedComments
+            console.log('comments.length in if statement: ' + listedComments.length);
+            return listedComments;
         }
     });
 }
