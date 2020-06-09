@@ -575,7 +575,7 @@ function run () {
                 baseMonth = 11;
                 baseYear -= 1;
             }
-
+            console.log('currMonth: ' + currMonth);
             // get issue data
             console.log("baseMonth: " + baseMonth);
             console.log("baseYear: " + baseYear);
