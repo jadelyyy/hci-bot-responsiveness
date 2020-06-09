@@ -406,8 +406,8 @@ function listComments(octokit, repoOwner, repoName, number, isPull) {
                 repo: repoName,
                 pull_number: number
             });
-            return listedComments;
             console.log('comments.length in if statement: ' + comments.length);
+            return listedComments;
         } else {
             console.log('isPull=false');
             const {data: listedComments} = yield octokit.issues.listComments({
@@ -415,8 +415,8 @@ function listComments(octokit, repoOwner, repoName, number, isPull) {
                 repo: repoName,
                 issue_number: number
             });
-            return listedComments
             console.log('comments.length in if statement: ' + comments.length);
+            return listedComments
         }
     });
 }
@@ -456,11 +456,13 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
             var issue, issueNumber, issueCreationDate;
             var total = 0;
             var unresponded = 0;
+            console.log('in getData function: ' + issues.length);
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
                 if(!isWithinMonth(issueCreationDate, baseMonth, baseYear)) {
+                    console.log('not within month');
                     continue;
                 }
                 total += 1;
