@@ -29,8 +29,8 @@ var badge_color_map = {
 
 var badge_name_map = {
     'response_time': 'general%20response%20time',
-    'collab_response_time': 'collab%20response%20time',
-    'contrib_response_time': 'collab%20&%20contrib%20response%20time',
+    'collab_response_time': 'collaborator%20response%20time',
+    'contrib_response_time': 'contributor%20response%20time',
     'unresponded': 'num%20unresponded',
     'ave_comments': 'num%20comments',
     'overall': 'responsiveness'

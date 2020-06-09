@@ -173,6 +173,12 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         var currTime = currData.aveResponseTime;
         var currCollabTime = currData.collabAveReponseTime;
         var currContribTime = currData.contribAveResponseTime;
+
+        console.log('\n\n\n\n');
+        console.log("in create issue function:");
+        console.log('currTime:' + currTime);
+        console.log('currCollabTime:' + currCollabTime);
+        console.log('currContribTime:' + currContribTime);
         // prevData = {
         //     firstResponseTimes: [0],
         //     total: 40,
@@ -352,12 +358,18 @@ function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
             issueMonth = 11;
         }
         var responseTimeStatus = additionalIssueData.responseTimeStatus;
+        var collabResponseTimeStatus = additionalIssueData.collabResponseTimeStatus;
+        var contribResponseTimeStatus = additionalIssueData.contribResponseTimeStatus;
         var numUnrespondedStatus = additionalIssueData.numUnrespondedStatus;
         var currData = additionalIssueData.currData;
         var currTime = currData.aveResponseTime;
+        var currCollabTime = currData.collabAveReponseTime;
+        var currContribTime = currData.contribAveResponseTime;
         var commentBody = `\n<h2>${month_name_map[issueMonth]}\n</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
-                            `<p>\nAverage response time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
+                            `<p>\nCollaborators Average Response Time <b>(${collabResponseTimeStatus.toUpperCase()})</b>: ${currCollabTime[0]} hours and ${currCollabTime[1]} minutes</p>` + 
+                            `<p>\nContributors Average Response Time <b>(${contribResponseTimeStatus.toUpperCase()})</b>: ${currContribTime[0]} hours and ${currContribTime[1]} minutes</p>` + 
+                            `<p>\nGeneral Average Response Time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                             `<h3>\nUnresponded Issues:</h3>` + 
                             `<p>\nNumber of unresponded issues <b>(${numUnrespondedStatus.toUpperCase()})</b>: ${currData.unresponded}/${currData.total}</p>`;
         var currIssue = yield getExistingIssue(newOctokit, repoName);
@@ -704,7 +716,7 @@ function run () {
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
             currMonthIssuesData.collabAveReponseTime = currMonthCollabAveResponseTime;
-            currMonthIssuesData.contriAveReponseTime = currMonthContribAveResponseTime;
+            currMonthIssuesData.contribAveReponseTime = currMonthContribAveResponseTime;
 
 
             var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
