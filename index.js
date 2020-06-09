@@ -568,7 +568,7 @@ function run () {
             // get month duration
             var currDate = new Date();
             var currMonth = currDate.getMonth();
-            var baseMonth = currMonth - 1;
+            var baseMonth = currMonth - 2;
             baseMonth = currMonth;
             var baseYear = currDate.getYear();
             if(baseMonth < 0) {
