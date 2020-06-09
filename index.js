@@ -427,19 +427,40 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
         if(comments.length == 0) {
             return null;
         } else {
-            var comment, commentCreationDate;
+            var comment, commentCreationDate, commentCreator;;
             var earliestCreationDate = new Date(comments[0].created_at);
             var collabEarliestCreationDate, contribEarliestCreationDate;
             for (var i = 0; i < comments.length; i++) {
                 comments = comments[i];
                 commentCreationDate = new Date(comment.created_at);
-
+                commentCreator = comment.user.login;
+                // collaborators
+                if(userData.collaborators.has(commentCreator)) {
+                    if(!collabEarliestCreationDate) {
+                        collabEarliestCreationDate = commentCreationDate;
+                    }
+                    if(commentCreationDate().getTime() < collabEarliestCreationDate.getTime()) {
+                        collabEarliestCreationDate = commentCreationDate;
+                    }
+                }
+                // collaborators and contributors
+                if(userData.contributors.has(commentCreator)) {
+                    if(!contribEarliestCreationDate) {
+                        contribEarliestCreationDate = commentCreationDate;
+                    }
+                    if(commentCreationDate().getTime() < contribEarliestCreationDate.getTime()) {
+                        contribEarliestCreationDate = commentCreationDate;
+                    }
+                }
+                // anyone
                 if(commentCreationDate.getTime() < earliestCreationDate.getTime()) {
                     earliestCreationDate = commentCreationDate;
                 }
             }
             // return earliestCreationDate;
             return {
+                firstContribResponseDate: contribEarliestCreationDate,
+                firstCollabResponseDate: collabEarliestCreationDate,
                 firstResponseDate: earliestCreationDate,
                 totalComments: comments.length
             }
@@ -457,11 +478,15 @@ function getUserData(octokit, repoOwner, repoName) {
             owner: repoOwner,
             repo: repoName
         });
-        console.log('collaborators: ' + collaborators[0].login);
-        var collaboratorsSet = new Set(collaborators);
+        var collaboratorsSet = new Set();
+        for (var i = 0; i < collaborators.length; i ++){
+            collaboratorsSet.add(collaborators[i].login);
+        }
         console.log('collaboratorsSet: ' + collaboratorsSet.size);
-        var contributorsSet = new Set(contributors);
-        console.log('contributors: ' + contributors[0].login)
+        var contributorsSet = new Set();
+        for (var i = 0; i < contributors.length; i ++){
+            contributorsSet.add(contributors[i].login);
+        }
         console.log('contributorsSet: ' + contributorsSet.size);
         return {
             collaborators: collaboratorsSet,
@@ -476,6 +501,8 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
         try {
             var userData = yield getUserData(octokit, repoOwner, repoName);
             var firstResponseTimes = [];
+            var firstContribResponseTimes = [];
+            var firstCollabResponseTimes = [];
             var numComments = [];
             var numReviewComments = [];
             var commentsData;
@@ -492,6 +519,12 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 total += 1;
                 commentsData = yield getCommentsData(octokit, repoOwner, repoName, userData, issueNumber, isPull);
                 if(commentsData) {
+                    if(commentsData.firstCollabResponseDate) {
+                        firstCollabResponseTimes.push(getDifference(issueCreationDate, commentsData.firstCollabResponseDate));
+                    }
+                    if(commentsData.firstContribResponseTimes) {
+                        firstContribResponseTimes.push(getDifference(issueCreationDate, commentsData.firstContribResponseDate));
+                    }
                     firstResponseTimes.push(getDifference(issueCreationDate, commentsData.firstResponseDate));
                     numComments.push(commentsData.totalComments);
                 } else {
@@ -502,6 +535,8 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 }
             }
             var allData = {
+                firstCollabResponseTimes: firstCollabResponseTimes,
+                firstContribResponseTimes: firstContribResponseTimes,
                 firstResponseTimes: firstResponseTimes,
                 total: total,
                 unresponded: unresponded,
@@ -603,13 +638,21 @@ function run () {
             console.log("baseMonth: " + baseMonth);
             console.log("baseYear: " + baseYear);
             var currMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, false);
+            var currMonthCollabAveResponseTime = getAverageTime(currMonthIssuesData.firstCollabResponseTimes);
+            var currMonthContribAveResponseTime = getAverageTime(currMonthIssuesData.firstContribResponseTimes);
             var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
             console.log('currMonthResponseTimes Array: ' + currMonthIssuesData.firstResponseTimes);
             console.log('number of currMonthResponseTimes: ' + currMonthIssuesData.firstResponseTimes.length);
-            console.log('currMonthAveResponseTimes: ' + currMonthAveResponseTime);
+            console.log('currMonthAveResponseTime: ' + currMonthAveResponseTime);
+            console.log('number of currMonthCollabResponseTimes: ' + currMonthIssuesData.firstCollabResponseTimes.length);
+            console.log('currMonthCollabAveResponseTime: ' + currMonthCollabAveResponseTime);
+            console.log('number of currMonthContribResponseTimes: ' + currMonthIssuesData.firstContribResponseTimes.length);
+            console.log('currMonthContribAveResponseTime: ' + currMonthContribAveResponseTime);
             console.log(`${currMonthIssuesData.unresponded}/${currMonthIssuesData.total} unresponded`);
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
+            currMonthIssuesData.collabAveReponseTime = currMonthCollabAveResponseTime;
+            currMonthIssuesData.contriAveReponseTime = currMonthContribAveResponseTime;
 
 
             var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
