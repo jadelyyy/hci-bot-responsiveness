@@ -431,7 +431,7 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
             var earliestCreationDate = new Date(comments[0].created_at);
             var collabEarliestCreationDate, contribEarliestCreationDate;
             for (var i = 0; i < comments.length; i++) {
-                comments = comments[i];
+                comment = comments[i];
                 commentCreationDate = new Date(comment.created_at);
                 commentCreator = comment.user.login;
                 // collaborators
