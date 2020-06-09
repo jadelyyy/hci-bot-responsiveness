@@ -400,29 +400,27 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
 function listComments(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
         if (isPull) {
-            console.log("isPull=true");
             const {data: listedComments} = yield octokit.pulls.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 pull_number: number
             });
-            console.log('comments.length in if statement: ' + comments.length);
             return listedComments;
         } else {
-            console.log('isPull=false');
             const {data: listedComments} = yield octokit.issues.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 issue_number: number
             });
-            console.log('comments.length in if statement: ' + listedComments.length);
             return listedComments;
         }
     });
 }
 
-function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
+function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
+        var collaborators = userData.collaborators;
+        var contributors = userData.contributors;
         var comments = yield listComments(octokit, repoOwner, repoName, number, isPull);
         // return immediately if issue has no comments
         console.log('returnedComments: ' + comments.length);
@@ -431,6 +429,7 @@ function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
         } else {
             var commentCreationDate;
             var earliestCreationDate = new Date(comments[0].created_at);
+            var collabEarliestCreationDate, contribEarliestCreationDate;
             for (var i = 0; i < comments.length; i++) {
                 commentCreationDate = new Date(comments[i].created_at);
                 if(commentCreationDate.getTime() < earliestCreationDate.getTime()) {
@@ -446,9 +445,32 @@ function getCommentsData(octokit, repoOwner, repoName, number, isPull) {
     });
 }
 
+function getUserData(octokit, repoOwner, repoName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const {data: collaborators} = yield octokit.repos.listCollaborators({
+            owner: repoOwner,
+            repo: repoName,
+        });
+        const {data: contributors} = yield octokit.repos.listContributors({
+            owner: repoOwner,
+            repo: repoName
+        });
+        var collaboratorsSet = new Set(collaborators);
+        console.log('collaboratorsSet: ' + collaboratorsSet.size);
+        var contributorsSet = new Set(contributors);
+        console.log('contributorsSet: ' + contributorsSet.size);
+        return {
+            collaborators: collaboratorsSet,
+            contributors: contributorsSet
+        }
+    });
+}
+
+
 function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            var userData = yield getUserData(octokit, repoOwner, repoName);
             var firstResponseTimes = [];
             var numComments = [];
             var numReviewComments = [];
@@ -456,17 +478,15 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
             var issue, issueNumber, issueCreationDate;
             var total = 0;
             var unresponded = 0;
-            console.log('in getData function: ' + issues.length);
             for (var i = 0; i < issues.length; i++) {
                 issue = issues[i];
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
                 if(!isWithinMonth(issueCreationDate, baseMonth, baseYear)) {
-                    console.log('not within month');
                     continue;
                 }
                 total += 1;
-                commentsData = yield getCommentsData(octokit, repoOwner, repoName, issueNumber, isPull);
+                commentsData = yield getCommentsData(octokit, repoOwner, repoName, userData, issueNumber, isPull);
                 if(commentsData) {
                     firstResponseTimes.push(getDifference(issueCreationDate, commentsData.firstResponseDate));
                     numComments.push(commentsData.totalComments);
