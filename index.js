@@ -439,7 +439,7 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
                     if(!collabEarliestCreationDate) {
                         collabEarliestCreationDate = commentCreationDate;
                     }
-                    if(commentCreationDate().getTime() < collabEarliestCreationDate.getTime()) {
+                    if(commentCreationDate.getTime() < collabEarliestCreationDate.getTime()) {
                         collabEarliestCreationDate = commentCreationDate;
                     }
                 }
@@ -448,7 +448,7 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
                     if(!contribEarliestCreationDate) {
                         contribEarliestCreationDate = commentCreationDate;
                     }
-                    if(commentCreationDate().getTime() < contribEarliestCreationDate.getTime()) {
+                    if(commentCreationDate.getTime() < contribEarliestCreationDate.getTime()) {
                         contribEarliestCreationDate = commentCreationDate;
                     }
                 }
