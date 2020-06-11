@@ -226,8 +226,11 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             var overallChangeString;
 
             responseTimeStatus = getResponseTimeStatus(timeDifference, changes);
+            console.log('responseTimeStatus: ' + responseTimeStatus);
             collabResponseTimeStatus= getResponseTimeStatus(collabTimeDifference, changes);
-            contribResponseTimeBadge = getResponseTimeStatus(contribTimeDifference, changes);
+            console.log('collabResponseTimeStatus: ' + collabResponseTimeStatus);
+            contribResponseTimeStatus = getResponseTimeStatus(contribTimeDifference, changes);
+            console.log('contribResponseTimeStatus: ' + contribResponseTimeStatus);
           
             // more responded previous month
             if(unrespondedDifference > 0) {
