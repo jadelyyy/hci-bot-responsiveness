@@ -229,6 +229,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             console.log('prevTime: ' + prevTime);
             var changes = [];
             var timeDifference  = calculateTimeDifference(currTime, prevTime);
+            console.log('calculating time difference for: \n\n');
+            console.log('currCollabTime: ' + currCollabTime);
+            console.log('prevCOlalbTime: ' + prevCollabTime);
             var collabTimeDifference = calculateTimeDifference(currCollabTime, prevCollabTime);
             var contribTimeDifference = calculateTimeDifference(currContribTime, prevContribTime);
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
