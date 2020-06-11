@@ -21,7 +21,7 @@ var overall_map = {
 var badge_color_map = {
     'response_time': response_map,
     'collab_response_time': response_map,
-    'contrib_respone_time': response_map,
+    'contrib_response_time': response_map,
     'unresponded': unresponded_map,
     'ave_comments': ave_comments_map,
     'overall': overall_map
