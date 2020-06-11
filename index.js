@@ -157,6 +157,9 @@ function getResponseTimeStatus(timeDifference, changes) {
 }
 
 function calculateTimeDifference(currTime, prevTime) {
+    console.log('in calculatetime difference: \n\n');
+    console.log('currTime: ' + currTime);
+    console.log('prevTime: ' + prevTime);
     return (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
 }
 
@@ -192,6 +195,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         var prevCollabTime = prevData.collabAveResponseTime;
         var prevContribTime = prevData.contribAveResponseTime;
 
+        console.log('prevCollabTime before if statement: ' + prevCollabTime);
         
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
