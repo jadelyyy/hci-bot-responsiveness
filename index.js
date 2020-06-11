@@ -189,10 +189,9 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         // }
         // prevData.total = 0;
         var prevTime = prevData.aveResponseTime;
-        var prevCollabTime = prevData.collabAveReponseTime;
+        var prevCollabTime = prevData.collabAveResponseTime;
         var prevContribTime = prevData.contribAveResponseTime;
 
-        console.log('prevCollabTime before if statement: ' + prevCollabTime);
         
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
