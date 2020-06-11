@@ -141,17 +141,17 @@ function getResponseTimeStatus(timeDifference, changes) {
     var responseTimeStatus;
     if(timeDifference > 0) {
         changes.push(-1);
-        timeStatus = 'slower';
+        responseTimeStatus = 'slower';
     }
     // response stayed the same
     if(timeDifference == 0) {
         changes.push(0);
-        timeStatus = 'same';
+        responseTimeStatus = 'same';
     }
     // response time increased
     if(timeDifference < 0) {
         changes.push(1);
-        timeStatus = 'faster';
+        responseTimeStatus = 'faster';
     }
     return responseTimeStatus;
 }
