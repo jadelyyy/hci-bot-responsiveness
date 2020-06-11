@@ -264,12 +264,15 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
 
             badgeData = getTimeString(currTime);
             responseTimeBadge = createBadgeWithData('response_time', responseTimeStatus, badgeData);
+            console.log('responseTimeBadge: ' + responseTimeBadge);
 
             badgeData = getTimeString(currCollabTime);
             collabResponseTimeBadge = createBadgeWithData('collab_response_time', collabResponseTimeStatus, badgeData);
+            console.log('collabResponseTimeBadge: ' + collabResponseTimeBadge);
 
             badgeData = getTimeString(currContribTime);
             contribResponseTimeBadge = createBadgeWithData('contrib_response_time', contribResponseTimeStatus, badgeData);
+            console.log('contribResponseTimeBadge: ' + contribResponseTimeBadge);
 
             badgeData = `${currData.unresponded}/${currData.total} issues`;
             numUnrespondedBadge = createBadgeWithData('unresponded', numUnrespondedStatus, badgeData);
