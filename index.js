@@ -157,9 +157,6 @@ function getResponseTimeStatus(timeDifference, changes) {
 }
 
 function calculateTimeDifference(currTime, prevTime) {
-    console.log('in calculatetime difference: \n\n');
-    console.log('currTime: ' + currTime);
-    console.log('prevTime: ' + prevTime);
     return (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
 }
 
@@ -177,11 +174,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         var currCollabTime = currData.collabAveReponseTime;
         var currContribTime = currData.contribAveResponseTime;
 
-        console.log('\n\n\n\n');
-        console.log("in create issue function:");
-        console.log('currTime:' + currTime);
-        console.log('currCollabTime:' + currCollabTime);
-        console.log('currContribTime:' + currContribTime);
         // prevData = {
         //     firstResponseTimes: [0],
         //     total: 40,
@@ -194,8 +186,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         var prevTime = prevData.aveResponseTime;
         var prevCollabTime = prevData.collabAveResponseTime;
         var prevContribTime = prevData.contribAveResponseTime;
-
-        console.log('prevCollabTime before if statement: ' + prevCollabTime);
         
         if (currData.total == 0) {
             issueBody = `There were no issues created this month.`;
@@ -229,37 +219,16 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         } else {
             var changes = [];
             var timeDifference  = calculateTimeDifference(currTime, prevTime);
-            console.log('calculating time difference for: \n\n');
-            console.log('currCollabTime: ' + currCollabTime);
-            console.log('prevCOlalbTime: ' + prevCollabTime);
             var collabTimeDifference = calculateTimeDifference(currCollabTime, prevCollabTime);
             var contribTimeDifference = calculateTimeDifference(currContribTime, prevContribTime);
             var unrespondedDifference = (Math.floor(currData.unresponded/currData.total * 100)) - (Math.floor(prevData.unresponded/prevData.total * 100));
             var overallChange, initMessage;
             var overallChangeString;
 
-            console.log("\n\n\n\n");
-            console.log('timeDifference: ' + timeDifference);
-            console.log('unrespondedDifference: ' + unrespondedDifference);
-
             responseTimeStatus = getResponseTimeStatus(timeDifference, changes);
             collabResponseTimeStatus= getResponseTimeStatus(collabTimeDifference, changes);
             contribResponseTimeBadge = getResponseTimeStatus(contribTimeDifference, changes);
-            // // response time decreased
-            // if(timeDifference > 0) {
-            //     changes.push(-1);
-            //     responseTimeStatus = 'slower';
-            // }
-            // // response stayed the same
-            // if(timeDifference == 0) {
-            //     changes.push(0);
-            //     responseTimeStatus = 'same';
-            // }
-            // // response time increased
-            // if(timeDifference < 0) {
-            //     changes.push(1);
-            //     responseTimeStatus = 'faster';
-            // }
+          
             // more responded previous month
             if(unrespondedDifference > 0) {
                 changes.push(-1)
