@@ -679,7 +679,7 @@ function run () {
             var currMonthPullsAveResponseTime = getAverageTime(currMonthPullsData.firstResponseTimes);
             console.log('currMonthPullsCollabAveResponseTime: '+ currMonthPullsCollabAveResponseTime);
             console.log('currMonthPullsContribAveResponseTime: '+ currMonthPullsContribAveResponseTime);
-
+            console.log('currMomthPullsAveResponseTime: ' + currMonthPullsAveResponseTime);
             currMonthPullsData.aveResponseTime = currMonthPullsAveResponseTime;
 
             // get prev month duration
