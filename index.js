@@ -223,15 +223,10 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
 
             overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
 
-            console.log('responseTimeBadge: ' + responseTimeBadge);
-            console.log('\nnumUnrespondedBadge: ' + numUnrespondedBadge);
-
             issueBody = `<p align="center">${overallBadge}\n</p>` + 
                         `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                         `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
         } else {
-            console.log('currTime: ' + currTime);
-            console.log('prevTime: ' + prevTime);
             var changes = [];
             var timeDifference  = calculateTimeDifference(currTime, prevTime);
             console.log('calculating time difference for: \n\n');
@@ -724,7 +719,7 @@ function run () {
 
             currMonthIssuesData.aveResponseTime = currMonthAveResponseTime;
             currMonthIssuesData.collabAveReponseTime = currMonthCollabAveResponseTime;
-            currMonthIssuesData.contribAveReponseTime = currMonthContribAveResponseTime;
+            currMonthIssuesData.contribAveResponseTime = currMonthContribAveResponseTime;
 
 
             var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
