@@ -677,10 +677,14 @@ function run () {
             var currMonthPullsCollabAveResponseTime = getAverageTime(currMonthPullsData.firstCollabResponseTimes);
             var currMonthPullsContribAveResponseTime = getAverageTime(currMonthPullsData.firstContribResponseTimes);
             var currMonthPullsAveResponseTime = getAverageTime(currMonthPullsData.firstResponseTimes);
+
+            currMonthPullsData.aveResponseTime = currMonthPullsAveResponseTime;
+            currMonthPullsData.collabAveReponseTime = currMonthPullsCollabAveResponseTime;
+            currMonthPullsData.contribAveResponseTime = currMonthPullsContribAveResponseTime;
+
             console.log('currMonthPullsCollabAveResponseTime: '+ currMonthPullsCollabAveResponseTime);
             console.log('currMonthPullsContribAveResponseTime: '+ currMonthPullsContribAveResponseTime);
             console.log('currMomthPullsAveResponseTime: ' + currMonthPullsAveResponseTime);
-            currMonthPullsData.aveResponseTime = currMonthPullsAveResponseTime;
 
             // get prev month duration
             baseMonth -= 1;
