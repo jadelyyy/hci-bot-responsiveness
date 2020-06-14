@@ -386,6 +386,10 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
                 comment = comments[i];
                 commentCreationDate = new Date(comment.created_at);
                 commentCreator = comment.user.login;
+                if (isPull) {
+                    console.log('commentcreationdate: ' + commentCreationDate);
+                    console.log('commentCreator: ' + commentCreator);
+                }
                 // collaborators
                 if(userData.collaborators.has(commentCreator)) {
                     if(!collabEarliestCreationDate) {
