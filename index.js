@@ -4,23 +4,11 @@ const github = require("@actions/github");
 const infoRepoOwner = 'jadelyyy';
 const infoRepoName = 'responsiveness-info';
 
-const {badge_color_map, badge_name_map} = require("./badgeData.js");
-var month_map = {0: 31, 1: 28, 2: 31, 3: 30, 4: 31, 5: 30, 6: 31, 7: 31, 8: 30, 9: 31, 10: 30, 11:31};
+const {month_map, month_name_map} = require("./constants/monthData.js");
 
-var month_name_map = {
-    0: 'January',
-    1: 'February',
-    2: 'March',
-    3: 'April',
-    4: 'May',
-    5: 'June',
-    6: 'July',
-    7: 'August',
-    8: 'September',
-    9: 'October',
-    10: 'November',
-    11: 'December'
-}
+const {createBadge, createBadgeWithData} = require("./util/badge.js");
+
+const {getDifference, getAverage, getTimeString} = require("./util/time.js");
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -30,28 +18,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-
-// assume timeB later than timeA
-function getDifference(dateA, dateB) {
-    var difference = dateB - dateA;
-    // 1000 milliseconds in 1 second, 60 seconds in 1 minute
-    var differenceInMinutes = Math.floor((difference/1000)/60);
-    return differenceInMinutes;
-}
-
-function getAverageTime(times) {
-    if(times.length == 0) {
-        return null;
-    }
-    var sum = 0;
-    for (var i = 0; i < times.length; i++) {
-        sum += times[i];
-    }
-    var averageTimeInMinutes = sum/times.length;
-    var hours = Math.floor(averageTimeInMinutes/60);
-    var minutes = Math.floor(averageTimeInMinutes % 60);
-    return [hours, minutes]
-}
 
 function getAverageNumComments(comments) {
     if(comments.length == 0) {
@@ -73,59 +39,6 @@ function getOverallChange(changes) {
     return change;
 }
 
-function createBadge(badgeName, message, style='flat') {
-    var color;
-    console.log('badgeName: ' + badgeName);
-    console.log('message: ' + message);
-    if(message == 'no issues') {
-        message = 'no issues last month';
-        color = 'blue';
-    } else if(message == 'same') {
-        color = 'yellow';
-    } else {
-        color = badge_color_map[badgeName][message];
-    }
-    var label = badge_name_map[badgeName];
-    message = message.replace(/ /g,"%20");
-    if(style == 'flat') {        
-        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}">`;
-    } else {
-        return `<img src="https://img.shields.io/static/v1?label=${label}&message=${message}&color=${color}&style=${style}">`
-    }
-}
-
-function createBadgeWithData(badgeName, status, data) {
-    console.log('status: ' + status);
-    var color;
-    if(status == 'no issues') {
-        color = 'blue';
-    } else if(status == 'same') {
-        color = 'yellow';
-    } else {
-        color = badge_color_map[badgeName][status];
-    }
-    data = data.replace(/ /g,"%20");
-    var label = badge_name_map[badgeName];
-    return `<img src="https://img.shields.io/static/v1?label=${label}&message=${data}&color=${color}">`;
-}
-
-function getTimeString(time) {
-    var timeString;
-    if(time[1] == 0) {
-        if(time[0] == 1) {
-            timeString = `${time[1]} hr`;
-        } else {
-            timeString = `${time[1]} hrs`;
-        }
-    } else {
-        if(time[0] == 0) {
-            timeString = `${time[1]} mins`;
-        } else  {
-            timeString = `${time[0]} hr ${time[1]} mins`
-        }
-    }
-    return timeString;
-}
 
 function getCommentsString(numComments) {
     var commentsString;
