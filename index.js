@@ -545,6 +545,7 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 issueCreationDate = new Date(issue.created_at);
                 if(!isWithinMonth(issueCreationDate, baseMonth, baseYear)) {
                     if(isPull) {
+                        console.log('issueCreationDate: ' + issueCreationDate);
                         console.log("NOT WITHIN MONTH: ");
                     }
                     continue;
