@@ -8,7 +8,7 @@ const {month_map, month_name_map} = require("./constants/monthData.js");
 
 const {createBadge, createBadgeWithData} = require("./util/badge.js");
 
-const {getDifference, getAverage, getTimeString} = require("./util/time.js");
+const {getDifference, getAverageTime, getTimeString} = require("./util/time.js");
 
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
