@@ -346,6 +346,7 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
 function listComments(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
         if (isPull) {
+            console.log('...listCommentsFunction: isPull is TRUE');
             const {data: listedComments} = yield octokit.pulls.listComments({
                 owner: repoOwner,
                 repo: repoName,
@@ -368,6 +369,9 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
         var collaborators = userData.collaborators;
         var contributors = userData.contributors;
         var comments = yield listComments(octokit, repoOwner, repoName, number, isPull);
+        console.log('\n insde of getCommentsData...');
+        console.log('collaborators: ' + userData.collaborators.size);
+        console.log('contributors: ' + userData.contributors.size);
         // return immediately if issue has no comments
         if(comments.length == 0) {
             return null;
