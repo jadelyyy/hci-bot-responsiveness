@@ -544,6 +544,9 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
                 if(!isWithinMonth(issueCreationDate, baseMonth, baseYear)) {
+                    if(isPull) {
+                        console.log("NOT WITHIN MONTH: ");
+                    }
                     continue;
                 }
                 total += 1;
@@ -673,6 +676,8 @@ function run () {
             currMonthIssuesData.collabAveReponseTime = currMonthCollabAveResponseTime;
             currMonthIssuesData.contribAveResponseTime = currMonthContribAveResponseTime;
 
+            console.log('number of pulls: ' + pulls.length);
+
             var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
             var currMonthPullsCollabAveResponseTime = getAverageTime(currMonthPullsData.firstCollabResponseTimes);
             var currMonthPullsContribAveResponseTime = getAverageTime(currMonthPullsData.firstContribResponseTimes);
@@ -684,7 +689,7 @@ function run () {
 
             console.log('currMonthPullsCollabAveResponseTime: '+ currMonthPullsCollabAveResponseTime);
             console.log('currMonthPullsContribAveResponseTime: '+ currMonthPullsContribAveResponseTime);
-            console.log('currMomthPullsAveResponseTime: ' + currMonthPullsAveResponseTime);
+            console.log('currMonthPullsAveResponseTime: ' + currMonthPullsAveResponseTime);
 
             // get prev month duration
             baseMonth -= 1;
@@ -699,16 +704,6 @@ function run () {
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
             var prevMonthCollabAveResponseTime = getAverageTime(prevMonthIssuesData.firstCollabResponseTimes);
             var prevMonthContribAveResponseTime = getAverageTime(prevMonthIssuesData.firstContribResponseTimes);
-            console.log('prevMonthResponseTimes Array: ' + prevMonthIssuesData.firstResponseTimes);
-            console.log('number of prevMonthResponseTimes: ' + prevMonthIssuesData.firstResponseTimes.length);
-            console.log('prevMonthAveResponseTimes: ' + prevMonthAveResponseTime);
-            console.log('');
-            console.log('number of prevMonthCollabResponeTimes: ' + prevMonthIssuesData.firstCollabResponseTimes.length);
-            console.log('prevMonthCollabAveResponseTime: ' + prevMonthCollabAveResponseTime);
-            console.log('number of prevMonthContribResponeTimes: ' + prevMonthIssuesData.firstContribResponseTimes.length);
-            console.log('prevMonthContribAveResponseTime: ' + prevMonthContribAveResponseTime);
-            console.log(`${prevMonthIssuesData.unresponded}/${prevMonthIssuesData.total} unresponded`);
-            console.log('numComments: ' + prevMonthIssuesData.numComments);
 
             prevMonthIssuesData.aveResponseTime = prevMonthAveResponseTime;
             prevMonthIssuesData.collabAveResponseTime = prevMonthCollabAveResponseTime;
@@ -716,13 +711,16 @@ function run () {
 
             var prevMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
             var prevMonthPullsAveResponseTime = getAverageTime(prevMonthPullsData.firstResponseTimes);
-            console.log('prevMonthPullsResponseTimes Array: ' + prevMonthPullsData.firstResponseTimes);
-            console.log('number of prevMonthPullsResponseTimes: ' + prevMonthPullsData.firstResponseTimes.length);
-            console.log(`${prevMonthPullsData.unresponded}/${prevMonthPullsData.total} unresponded`);
-            console.log('numComments: ' + prevMonthPullsData.numComments);
-            console.log('numReviewComments: ' + prevMonthPullsData.numReviewComments);
+            var prevMonthPullsCollabAveResponseTime = getAverageTime(prevMonthPullsData.firstCollabResponseTimes);
+            var prevMonthPullsContribAveResponseTime = getAverageTime(prevMonthPullsData.firstContribResponseTimes);
 
             prevMonthPullsData.aveResponseTime = prevMonthPullsAveResponseTime;
+            prevMonthPullsData.collabAveReponseTime = prevMonthPullsCollabAveResponseTime;
+            prevMonthPullsData.contribAveResponseTime = prevMonthPullsContribAveResponseTime;
+
+            console.log('prevMonthPullsContribAveResponseTime: ' + prevMonthPullsContribAveResponseTime);
+            console.log('prevMonthPullsCollabAveResponseTime: ' + prevMonthPullsCollabAveResponseTime);
+            console.log('prevMonthPullsAveResponseTime: ' + prevMonthPullsAveResponseTime);
 
             yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData, currMonthPullsData, prevMonthPullsData);
 
