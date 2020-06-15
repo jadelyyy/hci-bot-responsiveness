@@ -35,7 +35,6 @@ function getOverallChange(changes) {
     for (var i = 0; i < changes.length; i++) {
         change += changes[i];
     }
-    console.log('calcuated change: ' + change);
     return change;
 }
 
@@ -204,10 +203,6 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             yield updateAdditionalIssue(newOctokit, repoName, additionalIssueData);
             
             var additionalInfoIssue = yield getExistingIssue(newOctokit, repoName);
-            console.log('issue URL: ' + additionalInfoIssue.html_url);
-            console.log('overallBadge: ' + overallBadge);
-            console.log('responseTimeBadge: ' + responseTimeBadge);
-            console.log('numUnrespondedBadge: ' + numUnrespondedBadge);
             var issueBody = `<p align="center">${overallBadge}\n</p>` + 
                             `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.\n</h2>` + 
@@ -577,8 +572,6 @@ function run () {
             var octokit = new github.GitHub(userToken);
 
             var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
-
-            console.log('Total Number of Issues: ' + issues.length);
 
             var pulls = yield getAllPulls(octokit, repoOwner, repoName, [], 1);
 
