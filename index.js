@@ -547,7 +547,7 @@ function run () {
 
             var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
 
-            // var pulls = yield getAllPulls(octokit, repoOwner, repoName, [], 1);
+            var pulls = yield getAllPulls(octokit, repoOwner, repoName, [], 1);
 
             // get month duration
             var currDate = new Date();
