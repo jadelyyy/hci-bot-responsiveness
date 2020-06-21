@@ -109,27 +109,33 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
 
             // create issue if repository has never used the bot before
             yield createAdditionalIssue(newOctokit, repoName, additionalIssueData);
-            
-            badgeData = getTimeString(currTime);
-            responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
 
-            badgeData = getTimeString(currCollabTime);
-            collabResponseTimeBadge = createBadgeWithData('collab_response_time', 'no issues', badgeData);
+            if (currData.unresponded == currData.total) {
+                issueBody = `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>` + 
+                            `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+            } else {
 
-            badgeData = getTimeString(currContribTime);
-            contribResponseTimeBadge = createBadgeWithData('contrib_response_time', 'no issues', badgeData);
+                badgeData = getTimeString(currTime);
+                responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
 
-            badgeData = getTimeString(currTime);
-            responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
+                badgeData = getTimeString(currCollabTime);
+                collabResponseTimeBadge = createBadgeWithData('collab_response_time', 'no issues', badgeData);
 
-            badgeData = `${currData.unresponded}/${currData.total} issues`;
-            numUnrespondedBadge = createBadgeWithData('unresponded', 'no issues', badgeData);
+                badgeData = getTimeString(currContribTime);
+                contribResponseTimeBadge = createBadgeWithData('contrib_response_time', 'no issues', badgeData);
 
-            overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
+                badgeData = getTimeString(currTime);
+                responseTimeBadge = createBadgeWithData('response_time', 'no issues', badgeData);
 
-            issueBody = `<p align="center">${overallBadge}\n</p>` + 
-                        `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
-                        `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
+                badgeData = `${currData.unresponded}/${currData.total} issues`;
+                numUnrespondedBadge = createBadgeWithData('unresponded', 'no issues', badgeData);
+
+                overallBadge = createBadge('overall', 'no issues', 'for-the-badge');
+
+                issueBody = `<p align="center">${overallBadge}\n</p>` + 
+                            `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
+                            `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
+            }
         } else {
             // array to keep track of each metric
             var changes = [];
