@@ -76,15 +76,15 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         // var currPullContribTime = currPullsData.contribAveResponseTime;
 
         // altering api response data for testing purposes
-        // prevData = {
-        //     firstResponseTimes: [0],
-        //     total: 40,
-        //     unresponded: 40,
-        //     numComments: [2, 2],
-        //     aveResponseTime: [5, 47],
-        //     aveNumComments: 2
-        // }
-        // prevData.total = 0;
+        prevData = {
+            firstResponseTimes: [0],
+            total: 40,
+            unresponded: 40,
+            numComments: [2, 2],
+            aveResponseTime: [5, 47],
+            aveNumComments: 2
+        }
+        prevData.total = 0;
 
         var prevTime = prevData.aveResponseTime;
         var prevCollabTime = prevData.collabAveResponseTime;
