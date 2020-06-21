@@ -53,6 +53,7 @@ function calculateTimeDifference(currTime, prevTime) {
     return (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
 }
 
+// TODO: add additional pull data, need to fix/create functions dealing with pull data
 function createIssue(octokit, repoOwner, repoName, currData, prevData, currPullsData, prevPullsData) {
     return __awaiter(this, void 0, void 0, function* () {
         const additionalToken  = core.getInput('additional-token');
@@ -96,11 +97,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         
         // if no issues were created during the month
         if (currData.total == 0) {
-            if(currPullsData.total == 0) {
-                issueBody = 'There were no issues nor pulls created this month.';
-            } else {
-                issueBody = `There were no issues created this month.`;
-            }
+            issueBody = `There were no issues created this month.`;
         // if no issues were created during the prev month
         } else if (prevData.total == 0) {
 
@@ -572,7 +569,8 @@ function run () {
             currMonthIssuesData.collabAveReponseTime = currMonthCollabAveResponseTime;
             currMonthIssuesData.contribAveResponseTime = currMonthContribAveResponseTime;
 
-            // var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
+            // pull data not calculated correctly yet
+            var currMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
             // var currMonthPullsCollabAveResponseTime = getAverageTime(currMonthPullsData.firstCollabResponseTimes);
             // var currMonthPullsContribAveResponseTime = getAverageTime(currMonthPullsData.firstContribResponseTimes);
             // var currMonthPullsAveResponseTime = getAverageTime(currMonthPullsData.firstResponseTimes);
@@ -597,7 +595,8 @@ function run () {
             prevMonthIssuesData.collabAveResponseTime = prevMonthCollabAveResponseTime;
             prevMonthIssuesData.contribAveResponseTime = prevMonthContribAveResponseTime;
 
-            // var prevMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
+            // pull data not calculated correctly yet
+            var prevMonthPullsData = yield getData(octokit, repoOwner, repoName, pulls, baseMonth, baseYear, true);
             // var prevMonthPullsAveResponseTime = getAverageTime(prevMonthPullsData.firstResponseTimes);
             // var prevMonthPullsCollabAveResponseTime = getAverageTime(prevMonthPullsData.firstCollabResponseTimes);
             // var prevMonthPullsContribAveResponseTime = getAverageTime(prevMonthPullsData.firstContribResponseTimes);
