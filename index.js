@@ -61,6 +61,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             auth: additionalToken
         });
 
+        console.log(JSON.stringify(currData, null, '\t'));
+
         var issueBody;
         var responseTimeBadge, collabResponseTimeBadge, contribResponseTimeBadge, numUnrespondedBadge, overallBadge;
         var responseTimeStatus, collabResponseTimeStatus, contribResponseTimeStatus, numUnrespondedStatus, overallStatus;
