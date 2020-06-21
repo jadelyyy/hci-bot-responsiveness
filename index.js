@@ -147,11 +147,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             var overallChangeString;
 
             responseTimeStatus = getResponseTimeStatus(timeDifference, changes);
-            console.log('responseTimeStatus: ' + responseTimeStatus);
             collabResponseTimeStatus= getResponseTimeStatus(collabTimeDifference, changes);
-            console.log('collabResponseTimeStatus: ' + collabResponseTimeStatus);
             contribResponseTimeStatus = getResponseTimeStatus(contribTimeDifference, changes);
-            console.log('contribResponseTimeStatus: ' + contribResponseTimeStatus);
           
             // more responded previous month
             if(unrespondedDifference > 0) {
@@ -358,11 +355,6 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
         var collaborators = userData.collaborators;
         var contributors = userData.contributors;
         var comments = yield listComments(octokit, repoOwner, repoName, number, isPull);
-        if(isPull) {
-            console.log('\n insde of getCommentsData...');
-            console.log('collaborators: ' + userData.collaborators.size);
-            console.log('contributors: ' + userData.contributors.size);
-        }
         
         // return immediately if issue has no comments
         if(comments.length == 0) {
