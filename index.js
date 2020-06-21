@@ -292,12 +292,18 @@ function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
 
         const currData = additionalIssueData.currData;
         const currTime = currData.aveResponseTime;
-        var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
+        if(currData.unresponded == currData.total) {
+            var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
+                            `<h2>${month_name_map[issueMonth]}\n</h2>` + 
+                            `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+        } else {
+            var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
                         `<h2>${month_name_map[issueMonth]}\n</h2>` + 
                         `<h3>\nResponded Issues: </h3>` + 
                         `<p>\n    Average response time: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                         `<h3>\nUnresponded Issues:</h3>` + 
                         `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
+        }
 
         const {data: issue} = yield newOctokit.issues.create({
             owner: infoRepoOwner,
