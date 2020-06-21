@@ -111,7 +111,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
             yield createAdditionalIssue(newOctokit, repoName, additionalIssueData);
 
             if (currData.unresponded == currData.total) {
-                issueBody = `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>` + 
+                issueBody = `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h2>` + 
                             `<p>\n    Number of unresponded issues: ${currData.unresponded}/${currData.total}</p>`;
             } else {
 
