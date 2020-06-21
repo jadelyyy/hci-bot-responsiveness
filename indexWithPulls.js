@@ -2,7 +2,7 @@ const { Octokit } = require("@octokit/rest");
 const core = require("@actions/core");
 const github = require("@actions/github");
 
-const {badge_color_map, badge_name_map} = require("./badgeData.js");
+const {badge_color_map, badge_name_map} = require("./constants/badgeData.js");
 console.log('IMPORTED....\n');
 console.log('badge_color_map: ' + badge_color_map);
 console.log('badge_name_map: ' + badge_name_map);

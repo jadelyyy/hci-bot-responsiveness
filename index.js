@@ -10,6 +10,7 @@ const {createBadge, createBadgeWithData} = require("./util/badge.js");
 
 const {getDifference, getAverageTime, getTimeString} = require("./util/time.js");
 
+// for asychronous Github api calls
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -19,34 +20,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 
-function getAverageNumComments(comments) {
-    if(comments.length == 0) {
-        return null;
-    }
-    var sum = 0;
-    for (var i = 0; i < comments.length; i++) {
-        sum += comments[i];
-    }
-    return Math.floor(sum/comments.length);
-}
-
 function getOverallChange(changes) {
     var change = 0;
     for (var i = 0; i < changes.length; i++) {
         change += changes[i];
     }
     return change;
-}
-
-
-function getCommentsString(numComments) {
-    var commentsString;
-    if(numComments == 1) {
-        commentsString = `${numComments} comment`;
-    } else {
-        commentsString = `${numComments} comments`;
-    }
-    return commentsString;
 }
 
 function getResponseTimeStatus(timeDifference, changes) {
@@ -68,6 +47,8 @@ function getResponseTimeStatus(timeDifference, changes) {
     return responseTimeStatus;
 }
 
+// calculating time differences
+// input in the format of [hours, minutes]
 function calculateTimeDifference(currTime, prevTime) {
     return (currTime[0] * 60 + currTime[1]) - (prevTime[0] * 60 + prevTime[1]);
 }
@@ -78,14 +59,22 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         var newOctokit = new Octokit({
             auth: additionalToken
         });
+
         var issueBody;
         var responseTimeBadge, collabResponseTimeBadge, contribResponseTimeBadge, numUnrespondedBadge, overallBadge;
         var responseTimeStatus, collabResponseTimeStatus, contribResponseTimeStatus, numUnrespondedStatus, overallStatus;
         var badgeData;
+
         var currTime = currData.aveResponseTime;
         var currCollabTime = currData.collabAveReponseTime;
         var currContribTime = currData.contribAveResponseTime;
 
+        // *** pull response data
+        // var currPullTime = currPullsData.aveResponseTime;
+        // var currPullCollabTime = currPullsData.collabAveReponseTime;
+        // var currPullContribTime = currPullsData.contribAveResponseTime;
+
+        // altering api response data for testing purposes
         // prevData = {
         //     firstResponseTimes: [0],
         //     total: 40,
@@ -95,17 +84,31 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
         //     aveNumComments: 2
         // }
         // prevData.total = 0;
+
         var prevTime = prevData.aveResponseTime;
         var prevCollabTime = prevData.collabAveResponseTime;
         var prevContribTime = prevData.contribAveResponseTime;
+
+        // *** pull response data
+        // var prevPullTime = prevPullsData.aveResponseTime;
+        // var prevPullCollabTime = prevPullsData.collabAveResponseTime;
+        // var prevPullContribTime = prevPullsData.contribAveResponseTime;
         
+        // if no issues were created during the month
         if (currData.total == 0) {
-            issueBody = `There were no issues created this month.`;
+            if(currPullsData.total == 0) {
+                issueBody = 'There were no issues nor pulls created this month.';
+            } else {
+                issueBody = `There were no issues created this month.`;
+            }
+        // if no issues were created during the prev month
         } else if (prevData.total == 0) {
 
             const additionalIssueData = {
                 'currData': currData
             }
+
+            // create issue if repository has never used the bot before
             yield createAdditionalIssue(newOctokit, repoName, additionalIssueData);
             
             badgeData = getTimeString(currTime);
@@ -129,6 +132,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
                         `<p align="center">${collabResponseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;${contribResponseTimeBadge}${responseTimeBadge}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${numUnrespondedBadge}\n</p>` + 
                         `<h2>Thanks for using the responsiveness bot! Since it's your first time using it, there is no data on your repository's progress yet. Be sure to check again next month!</h>`;
         } else {
+            // array to keep track of each metric
             var changes = [];
             var timeDifference  = calculateTimeDifference(currTime, prevTime);
             var collabTimeDifference = calculateTimeDifference(currCollabTime, prevCollabTime);
@@ -160,6 +164,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
                 numUnrespondedStatus = 'decreased';
             }
 
+            // calculate summary of improvement vs. disimprovement
             overallChange = getOverallChange(changes);
             if(overallChange > 0) {
                 overallChangeString = 'has improved';
@@ -200,6 +205,7 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
                 'prevData': prevData
             }
     
+            // add comment to existing issue since repo has used bot before
             yield updateAdditionalIssue(newOctokit, repoName, additionalIssueData);
             
             var additionalInfoIssue = yield getExistingIssue(newOctokit, repoName);
@@ -208,6 +214,8 @@ function createIssue(octokit, repoOwner, repoName, currData, prevData, currPulls
                             `<h2>${initMessage} Your repository's overall responsiveness to issues ${overallChangeString} since last month.\n</h2>` + 
                             `<p>For more information on your repository's progress, visit <a href="${additionalInfoIssue.html_url}">${repoName}'s Additional Responsiveness Info</a></p>`
         }
+
+        // create issue in respository 
         const {data: issue} = yield octokit.issues.create({
             owner: repoOwner,
             repo: repoName,
@@ -234,12 +242,14 @@ function getExistingIssue(newOctokit, repoName) {
 
 function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
+
         const currDate = new Date();
         var currMonth = currDate.getMonth();
         var issueMonth = currMonth - 1;
         if(issueMonth < 0) {
             issueMonth = 11;
         }
+
         var responseTimeStatus = additionalIssueData.responseTimeStatus;
         var collabResponseTimeStatus = additionalIssueData.collabResponseTimeStatus;
         var contribResponseTimeStatus = additionalIssueData.contribResponseTimeStatus;
@@ -248,6 +258,7 @@ function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
         var currTime = currData.aveResponseTime;
         var currCollabTime = currData.collabAveReponseTime;
         var currContribTime = currData.contribAveResponseTime;
+
         var commentBody = `\n<h2>${month_name_map[issueMonth]}\n</h2>` + 
                             `<h3>\nResponded Issues: </h3>` + 
                             `<p>\nCollaborators Average Response Time <b>(${collabResponseTimeStatus.toUpperCase()})</b>: ${currCollabTime[0]} hours and ${currCollabTime[1]} minutes</p>` + 
@@ -255,7 +266,9 @@ function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
                             `<p>\nGeneral Average Response Time <b>(${responseTimeStatus.toUpperCase()})</b>: ${currTime[0]} hours and ${currTime[1]} minutes</p>` + 
                             `<h3>\nUnresponded Issues:</h3>` + 
                             `<p>\nNumber of unresponded issues <b>(${numUnrespondedStatus.toUpperCase()})</b>: ${currData.unresponded}/${currData.total}</p>`;
+
         var currIssue = yield getExistingIssue(newOctokit, repoName);
+
         if(currIssue) {
             var issueNumber = currIssue.number;
             newOctokit.issues.createComment({
@@ -270,12 +283,14 @@ function updateAdditionalIssue(newOctokit, repoName, additionalIssueData) {
 
 function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     return __awaiter(this, void 0, void 0, function* () {
+
         const currDate = new Date();
         var currMonth = currDate.getMonth();
         var issueMonth = currMonth - 1;
         if(issueMonth < 0) {
             issueMonth = 11;
         }
+
         const currData = additionalIssueData.currData;
         const currTime = currData.aveResponseTime;
         var issueBody = `<h1>Additional Info For Monthly Responsiveness For ${repoName}\n</h1>` + 
@@ -294,40 +309,7 @@ function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
     });
 }
 
-function isWithinMonth2(creationDate, baseDate) {
-    try {
-        if (baseDate.getYear() % 4 == 0) {
-            month_map[1] = 29; 
-        }
-
-        var withinMonth = false; 
-        var prevMonth = false; 
-        //  // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse
-        if (baseDate.getMonth() == creationDate.getMonth() && creationDate.getYear() == baseDate.getYear() &&
-            baseDate.getDate() >= creationDate.getDate()) {
-            withinMonth = true;
-        }
-        else if (creationDate.getYear() != baseDate.getYear()) {
-            prevMonth = (creationDate.getYear() == baseDate.getYear()-1) && baseDate.getMonth() == 0 && creationDate.getMonth() == 11; 
-            
-        } else { // year is the same, month is diff 
-            prevMonth =  (baseDate.getMonth() - creationDate.getMonth()) == 1; // check if created_at is less than 1 month from current moment 
-        }
-        var dateMinimum = Math.max(month_map[creationDate.getMonth()] - (31 - baseDate.getDate()) + 1, 1);
-        if (!withinMonth) {
-            withinMonth = prevMonth && creationDate.getDate() >= dateMinimum;
-        }
-        
-        // console.log("within month:", withinMonth, " , creation date:", creationDate, ", base date: ", baseDate, ", prev month: ", prevMonth, " , date min:", dateMinimum);
-        // console.log("creation month: ", creationDate.getMonth(), ", month map value:", month_map[creationDate.getMonth()], ", base day:", baseDate.getDate());
-        
-        return withinMonth;
-
-    } catch (err){
-        console.log(err);
-    }
-}
-
+// check if issue date is within base month/year
 function isWithinMonth(creationDate, baseMonth, baseYear) {
     var creationMonth = creationDate.getMonth();
     var creationYear = creationDate.getYear();
@@ -338,10 +320,10 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
     }
 }
 
+// get comments on either pull requests or issues
 function listComments(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
         if (isPull) {
-            console.log('...listCommentsFunction: isPull is TRUE');
             const {data: listedComments} = yield octokit.pulls.listComments({
                 owner: repoOwner,
                 repo: repoName,
@@ -361,6 +343,7 @@ function listComments(octokit, repoOwner, repoName, number, isPull) {
 
 function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
+
         var collaborators = userData.collaborators;
         var contributors = userData.contributors;
         var comments = yield listComments(octokit, repoOwner, repoName, number, isPull);
@@ -381,10 +364,6 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
                 comment = comments[i];
                 commentCreationDate = new Date(comment.created_at);
                 commentCreator = comment.user.login;
-                if (isPull) {
-                    console.log('commentcreationdate: ' + commentCreationDate);
-                    console.log('commentCreator: ' + commentCreator);
-                }
                 // collaborators
                 if(userData.collaborators.has(commentCreator)) {
                     if(!collabEarliestCreationDate) {
@@ -408,7 +387,6 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
                     earliestCreationDate = commentCreationDate;
                 }
             }
-            // return earliestCreationDate;
             return {
                 firstContribResponseDate: contribEarliestCreationDate,
                 firstCollabResponseDate: collabEarliestCreationDate,
@@ -419,6 +397,7 @@ function getCommentsData(octokit, repoOwner, repoName, userData, number, isPull)
     });
 }
 
+// returns set of repository collaborators and contributors
 function getUserData(octokit, repoOwner, repoName) {
     return __awaiter(this, void 0, void 0, function* () {
         const {data: collaborators} = yield octokit.repos.listCollaborators({
@@ -449,9 +428,7 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
     return __awaiter(this, void 0, void 0, function* () {
         try {
             var userData = yield getUserData(octokit, repoOwner, repoName);
-            var firstResponseTimes = [];
-            var firstContribResponseTimes = [];
-            var firstCollabResponseTimes = [];
+            var firstResponseTimes = [], firstContribResponseTimes = [], firstCollabResponseTimes = [];
             var numComments = [];
             var numReviewComments = [];
             var commentsData;
