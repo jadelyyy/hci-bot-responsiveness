@@ -4,11 +4,14 @@ inputs:
     repo-token:
       description: 'Token for the repository. Can be passed in using {{ secrets.GITHUB_TOKEN }}'
       required: true
-    additional-token: 
+    auth-token: 
       description: 'Token for creating and updating additional issue'
       required: false
     repo-name:
       description: 'Name of repository to analyze'
+      required: true
+    repo-owner:
+      description: 'Name of repository owner'
       required: true
     number-of-months:
       description: 'Number of months to analyze when calculating the responsiveness score.'

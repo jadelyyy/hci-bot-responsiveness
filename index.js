@@ -56,7 +56,7 @@ function calculateTimeDifference(currTime, prevTime) {
 // TODO: add additional pull data, need to fix/create functions dealing with pull data
 function createIssue(octokit, repoOwner, repoName, currData, prevData, currPullsData, prevPullsData) {
     return __awaiter(this, void 0, void 0, function* () {
-        const additionalToken  = core.getInput('additional-token');
+        const additionalToken  = core.getInput('auth-token');
         var newOctokit = new Octokit({
             auth: additionalToken
         });
@@ -481,60 +481,46 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
     });
 }
 
-function getAllIssues (octokit, repoOwner, repoName, allIssues, pageNum = 1) {
+function getBeginningOfPrevMonth(){
+    var currDate = new Date(); 
+    var currMonth = currDate.getMonth(); 
+    var prevMonth = (currMonth -1) % 12; 
+    var prevYear = currDate.getFullYear(); 
+    if (prevMonth > currMonth) {
+      prevYear -= 1; 
+    }
+    
+    var newDate = new Date(prevYear, prevMonth, 1, 0, 0, 0, 0);
+    console.log("ISO DATE:", newDate.toISOString()); 
+    return newDate;
+  }
+  
+
+function getAllIssuesAndPulls (octokit, repoOwner, repoName, allIssues, allPulls) {
     return __awaiter(this, void 0, void 0, function* () {
+        var queryDate = getBeginningOfPrevMonth(); 
         const {data: issues} = yield octokit.issues.listForRepo({
             owner: repoOwner,
             repo: repoName,
-            per_page: 100,
-            page: pageNum
+            since: queryDate, 
+            state: 'all'
         });
-        var issuesLeft = true;
-        if(issues.length == 0) {
-            issuesLeft = false;
+        if (status !== 200) {
+            throw new Error(`Received unexpected API status code ${status}`);
         }
-        if(issuesLeft) {
-            var issue;
-            for(var i = 0; i < issues.length; i++) {
-                issue = issues[i];
-                if(!issue.pull_request) {
-                    allIssues.push(issue);
-                } else {
-                    console.log('not adding pull request with number: ' + issue.number);
-                }
-            }
-            return yield getAllIssues(octokit, repoOwner, repoName, allIssues, pageNum + 1);
-        } else {
-            return allIssues;
+        if (issues.length === 0) {
+            console.log("No  issues..")
+            return; 
         }
-    });
-}
 
-function getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum = 1) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const {data: pulls} = yield octokit.pulls.list({
-            owner: repoOwner,
-            repo: repoName,
-            per_page: 100,
-            page: pageNum
-        });
-        var pullsLeft = true;
-        if(pulls.length == 0) {
-            pullsLeft = false;
-        }
-        if(pullsLeft) {
-            for (var i = 0; i < pulls.length; i++) {
-                const {data: pull} = yield octokit.pulls.get({
-                    owner: repoOwner,
-                    repo: repoName,
-                    pull_number: pulls[i].number
-                })
-                allPulls.push(pull);
+        for ( var issue of issues) {
+            if( "pull_request" in issue) {
+                allPulls.push(issue);
+            } else {
+                allIssues.push(issue);
             }
-            return yield getAllPulls(octokit, repoOwner, repoName, allPulls, pageNum + 1);
-        } else {
-            return allPulls;
         }
+       
     });
 }
 
@@ -543,13 +529,15 @@ function run () {
         try {
             const userToken  = core.getInput('repo-token');
             const repoName = core.getInput('repo-name');
-            const repoOwner = 'jadelyyy';
+            const repoOwner = core.getInput('repo-owner');
 
             var octokit = new github.GitHub(userToken);
 
-            var issues = yield getAllIssues(octokit, repoOwner, repoName, [], 1);
-
-            var pulls = yield getAllPulls(octokit, repoOwner, repoName, [], 1);
+            var issues = [];
+            var pulls = []
+            yield getAllIssuesAndPulls(octokit, repoOwner, repoName, issues, pulls, 1);
+            console.log("ISSUES: ", issues);
+            console.log("PULLS: ", pulls);
 
             // get month duration
             var currDate = new Date();
