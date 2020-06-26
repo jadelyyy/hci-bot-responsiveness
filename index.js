@@ -318,10 +318,10 @@ function createAdditionalIssue(newOctokit, repoName, additionalIssueData) {
 }
 
 // check if issue date is within base month/year
-function isWithinMonth(creationDate, baseMonth, baseYear) {
+function isWithinMonth(creationDate, baseDate) {
     var creationMonth = creationDate.getMonth();
     var creationYear = creationDate.getYear();
-    if(creationMonth == baseMonth && creationYear == baseYear) {
+    if(creationMonth == baseDate.getMonth() && creationYear == baseDate.getYear()) {
         return true;
     } else {
         return false;
@@ -331,22 +331,12 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
 // get comments on either pull requests or issues
 function listComments(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
-        // if (isPull) {
-        //     const {data: listedComments} = yield octokit.pulls.listComments({
-        //         owner: repoOwner,
-        //         repo: repoName,
-        //         pull_number: number
-        //     });
-        //     return listedComments;
-        // } else {
-            const {data: listedComments} = yield octokit.issues.listComments({
-                owner: repoOwner,
-                repo: repoName,
-                issue_number: number
-            });
-            console.log("is pull:", isPull, listedComments);
-            return listedComments;
-        // }
+        const {data: listedComments} = yield octokit.issues.listComments({
+            owner: repoOwner,
+            repo: repoName,
+            issue_number: number
+        });
+        return listedComments;
     });
 }
 
@@ -428,7 +418,7 @@ function getUserData(octokit, repoOwner, repoName) {
 }
 
 
-function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPull) {
+function getData(octokit, repoOwner, repoName, issues, baseDate, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             var userData = yield getUserData(octokit, repoOwner, repoName);
@@ -443,7 +433,7 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 issue = issues[i];
                 issueNumber = issue.number;
                 issueCreationDate = new Date(issue.created_at);
-                if(!isWithinMonth(issueCreationDate, baseMonth, baseYear)) {
+                if(!isWithinMonth(issueCreationDate, baseDate)) {
                     continue;
                 }
                 total += 1;
@@ -489,12 +479,25 @@ function getBeginningOfPrevMonth(){
     var newDate = new Date(prevYear, prevMonth, 1, 0, 0, 0, 0);
     console.log("ISO DATE:", newDate.toISOString()); 
     return newDate;
-  }
+}
   
+function getBeginningOfTwoMonthsAgo(){
+    var currDate = new Date(); 
+    var currMonth = currDate.getMonth(); 
+    var prevMonth = (currMonth -2) % 12; 
+    var prevYear = currDate.getFullYear(); 
+    if (prevMonth > currMonth) {
+      prevYear -= 1; 
+    }
+    
+    var newDate = new Date(prevYear, prevMonth, 1, 0, 0, 0, 0);
+    console.log("ISO DATE TWO MONTHS PRIOR:", newDate.toISOString()); 
+    return newDate;
+}
 
 function getAllIssuesAndPulls (octokit, repoOwner, repoName, allIssues, allPulls) {
     return __awaiter(this, void 0, void 0, function* () {
-        var queryDate = getBeginningOfPrevMonth(); 
+        var queryDate = getBeginningOfTwoMonthsAgo(); 
         const {status, data: issues} = yield octokit.issues.listForRepo({
             owner: repoOwner,
             repo: repoName,
@@ -533,8 +536,7 @@ function run () {
             var issues = [];
             var pulls = []
             yield getAllIssuesAndPulls(octokit, repoOwner, repoName, issues, pulls, 1);
-            console.log("ISSUES: ", issues);
-            console.log("PULLS: ", pulls);
+            console.log("PULLS,", pulls);
 
             // get month duration
             var currDate = new Date();
@@ -546,8 +548,10 @@ function run () {
                 baseMonth = 11;
                 baseYear -= 1;
             }
+            var queryDate = getBeginningOfPrevMonth(); 
+
             // get issue data
-            var currMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, false);
+            var currMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, queryDate, false);
             var currMonthCollabAveResponseTime = getAverageTime(currMonthIssuesData.firstCollabResponseTimes);
             var currMonthContribAveResponseTime = getAverageTime(currMonthIssuesData.firstContribResponseTimes);
             var currMonthAveResponseTime = getAverageTime(currMonthIssuesData.firstResponseTimes);
@@ -572,8 +576,9 @@ function run () {
                 baseMonth = 11;
                 baseYear -= 1;
             }
+            var queryDate = getBeginningOfTwoMonthsAgo(); 
        
-            var prevMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, false);
+            var prevMonthIssuesData = yield getData(octokit, repoOwner, repoName, issues, queryDate, false);
             var prevMonthAveResponseTime = getAverageTime(prevMonthIssuesData.firstResponseTimes);
             var prevMonthCollabAveResponseTime = getAverageTime(prevMonthIssuesData.firstCollabResponseTimes);
             var prevMonthContribAveResponseTime = getAverageTime(prevMonthIssuesData.firstContribResponseTimes);
