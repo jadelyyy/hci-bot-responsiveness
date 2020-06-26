@@ -331,21 +331,22 @@ function isWithinMonth(creationDate, baseMonth, baseYear) {
 // get comments on either pull requests or issues
 function listComments(octokit, repoOwner, repoName, number, isPull) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (isPull) {
-            const {data: listedComments} = yield octokit.pulls.listComments({
-                owner: repoOwner,
-                repo: repoName,
-                pull_number: number
-            });
-            return listedComments;
-        } else {
+        // if (isPull) {
+        //     const {data: listedComments} = yield octokit.pulls.listComments({
+        //         owner: repoOwner,
+        //         repo: repoName,
+        //         pull_number: number
+        //     });
+        //     return listedComments;
+        // } else {
             const {data: listedComments} = yield octokit.issues.listComments({
                 owner: repoOwner,
                 repo: repoName,
                 issue_number: number
             });
+            console.log("is pull:", isPull, listedComments);
             return listedComments;
-        }
+        // }
     });
 }
 
@@ -459,9 +460,6 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 } else {
                     unresponded += 1;
                 }
-                if(isPull) {
-                    numReviewComments.push(issue.review_comments);
-                }
             }
             var allData = {
                 firstCollabResponseTimes: firstCollabResponseTimes,
@@ -471,9 +469,7 @@ function getData(octokit, repoOwner, repoName, issues, baseMonth, baseYear, isPu
                 unresponded: unresponded,
                 numComments: numComments
             }
-            if(isPull) {
-                allData.numReviewComments = numReviewComments;
-            }
+            
             return allData;
         } catch(err) {
             console.log(err);
@@ -499,12 +495,13 @@ function getBeginningOfPrevMonth(){
 function getAllIssuesAndPulls (octokit, repoOwner, repoName, allIssues, allPulls) {
     return __awaiter(this, void 0, void 0, function* () {
         var queryDate = getBeginningOfPrevMonth(); 
-        const {data: issues} = yield octokit.issues.listForRepo({
+        const {status, data: issues} = yield octokit.issues.listForRepo({
             owner: repoOwner,
             repo: repoName,
             since: queryDate, 
             state: 'all'
         });
+
         if (status !== 200) {
             throw new Error(`Received unexpected API status code ${status}`);
         }
@@ -598,7 +595,7 @@ function run () {
             yield createIssue(octokit, repoOwner, repoName, currMonthIssuesData, prevMonthIssuesData);
 
         } catch(err) {
-            console.log(err);
+            console.log("error is", err);
         }
     });
 }
